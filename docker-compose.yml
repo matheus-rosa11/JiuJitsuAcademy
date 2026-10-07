@@ -1,0 +1,21 @@
+# Local development database. The API and front run with `dotnet run` / `npm run dev`.
+# Port 5433 avoids clashing with other local Postgres instances.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: jiujitsu
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - jiujitsu-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d jiujitsu"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  jiujitsu-pgdata:

@@ -1,0 +1,12 @@
+@api = http://localhost:5106
+
+GET {{api}}/health
+
+###
+GET {{api}}/api/dashboard
+
+###
+GET {{api}}/api/belts?studentType=Child
+
+###
+GET {{api}}/api/students?active=true
