@@ -95,15 +95,35 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
+// On Railway each service only sees its own variables: the API service must declare a reference variable
+// such as DATABASE_URL=${{Postgres.DATABASE_URL}} (or PGHOST=${{Postgres.PGHOST}}, etc.).
 static string ResolveConnectionString(IConfiguration configuration)
 {
-    // Railway's Postgres service exposes DATABASE_URL (postgresql://user:pass@host:port/db).
     var databaseUrl = configuration["DATABASE_URL"];
     if (!string.IsNullOrWhiteSpace(databaseUrl))
         return ConvertDatabaseUrl(databaseUrl);
 
-    return configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException("Configure DATABASE_URL or ConnectionStrings:DefaultConnection.");
+    if (!string.IsNullOrWhiteSpace(configuration["PGHOST"]))
+    {
+        return new NpgsqlConnectionStringBuilder
+        {
+            Host = configuration["PGHOST"],
+            Port = int.TryParse(configuration["PGPORT"], out var pgPort) ? pgPort : 5432,
+            Database = configuration["PGDATABASE"],
+            Username = configuration["PGUSER"],
+            Password = configuration["PGPASSWORD"],
+            SslMode = SslMode.Prefer
+        }.ConnectionString;
+    }
+
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    if (!string.IsNullOrWhiteSpace(connectionString))
+        return connectionString;
+
+    throw new InvalidOperationException(
+        "Database not configured. On Railway, add to the API service the reference variable " +
+        "DATABASE_URL=${{Postgres.DATABASE_URL}} (use the exact name of your Postgres service). " +
+        "Locally, set ConnectionStrings:DefaultConnection.");
 }
 
 static string ConvertDatabaseUrl(string databaseUrl)
