@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
 import { ToastProvider } from "@/components/Toast";
+import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
 const geist = Geist({
@@ -20,7 +21,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${geist.variable} antialiased`}>
+    <html lang="pt-BR" data-theme="light" className={`${geist.variable} antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <ToastProvider>
           <AppShell>{children}</AppShell>

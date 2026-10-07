@@ -11,10 +11,10 @@ export function cn(...classes: (string | false | null | undefined)[]) {
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "success";
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: "bg-zinc-900 text-white hover:bg-zinc-800 shadow-sm",
-  secondary: "bg-white text-zinc-800 ring-1 ring-zinc-200 hover:bg-zinc-50 shadow-sm",
+  primary: "bg-zinc-900 text-zinc-50 hover:bg-zinc-800 shadow-sm",
+  secondary: "bg-surface text-zinc-800 ring-1 ring-zinc-200 hover:bg-zinc-50 shadow-sm",
   ghost: "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
-  danger: "bg-white text-red-600 ring-1 ring-red-200 hover:bg-red-50",
+  danger: "bg-surface text-red-600 ring-1 ring-red-200 hover:bg-red-50",
   success: "bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm",
 };
 
@@ -52,7 +52,7 @@ export function Button({
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn("rounded-2xl bg-white ring-1 ring-zinc-200/70 shadow-sm", className)}>{children}</div>;
+  return <div className={cn("rounded-2xl bg-surface ring-1 ring-zinc-200/70 shadow-sm", className)}>{children}</div>;
 }
 
 export function CardHeader({ title, action, icon }: { title: string; action?: ReactNode; icon?: ReactNode }) {
@@ -85,7 +85,7 @@ export function Badge({ tone = "zinc", children, className }: { tone?: keyof typ
 }
 
 const fieldClass =
-  "w-full rounded-xl border-0 bg-white px-3.5 text-sm text-zinc-900 ring-1 ring-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 disabled:bg-zinc-50";
+  "w-full rounded-xl border-0 bg-surface px-3.5 text-sm text-zinc-900 ring-1 ring-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 disabled:bg-zinc-50";
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cn(fieldClass, "h-11", className)} {...props} />;
@@ -147,7 +147,7 @@ export function Segmented<T extends string>({
           onClick={() => onChange(o.value)}
           className={cn(
             "flex-1 cursor-pointer whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
-            value === o.value ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-500 hover:text-zinc-800",
+            value === o.value ? "bg-surface text-zinc-900 shadow-sm dark:bg-zinc-300" : "text-zinc-500 hover:text-zinc-800",
           )}
         >
           {o.label}
@@ -187,12 +187,12 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
-      <div className="absolute inset-0 bg-zinc-950/40 backdrop-blur-[2px]" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] dark:bg-black/60" onClick={onClose} />
       <div
         role="dialog"
         aria-modal="true"
         className={cn(
-          "relative flex max-h-[92dvh] w-full flex-col rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl",
+          "relative flex max-h-[92dvh] w-full flex-col rounded-t-3xl bg-surface shadow-2xl sm:rounded-3xl dark:ring-1 dark:ring-white/10",
           size === "md" ? "sm:max-w-lg" : "sm:max-w-2xl",
         )}
       >

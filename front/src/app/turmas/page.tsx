@@ -70,7 +70,7 @@ function ClassModal({ initial, onClose, onSaved }: { initial?: TrainingClass; on
                 onClick={() => toggleDay(day)}
                 className={cn(
                   "h-11 w-12 cursor-pointer rounded-xl text-sm font-medium ring-1",
-                  form.daysOfWeek.includes(day) ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white text-zinc-600 ring-zinc-200",
+                  form.daysOfWeek.includes(day) ? "bg-zinc-900 text-zinc-50 ring-zinc-900" : "bg-surface text-zinc-600 ring-zinc-200",
                 )}
               >
                 {label}
@@ -157,7 +157,7 @@ export default function ClassesPage() {
                       key={day}
                       className={cn(
                         "flex h-8 flex-1 items-center justify-center rounded-lg text-xs font-medium",
-                        c.daysOfWeek.includes(day) ? "bg-zinc-900 text-white" : "bg-zinc-50 text-zinc-300",
+                        c.daysOfWeek.includes(day) ? "bg-zinc-900 text-zinc-50" : "bg-zinc-50 text-zinc-300",
                         day === today && "ring-2 ring-emerald-400 ring-offset-1",
                       )}
                     >

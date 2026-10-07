@@ -15,7 +15,7 @@ export function BeltBadge({ name, degree = 0, size = "md" }: { name: string; deg
 
   return (
     <div
-      className={cn("relative shrink-0 overflow-hidden rounded-[3px] ring-1 ring-black/15", s.belt)}
+      className={cn("relative shrink-0 overflow-hidden rounded-[3px] ring-1 ring-black/15 dark:ring-white/25", s.belt)}
       style={{ background: look.main }}
       title={`${name} — ${degreeLabel(degree)}`}
     >

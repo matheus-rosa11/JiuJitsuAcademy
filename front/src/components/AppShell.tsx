@@ -4,6 +4,7 @@ import { Award, CalendarCheck, LayoutDashboard, School, Users, Wallet } from "lu
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "./ui";
 
 const NAV = [
@@ -37,7 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-zinc-50">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-zinc-950 px-4 py-6 lg:flex">
+      <aside className="palette-fixed fixed inset-y-0 left-0 z-30 hidden w-64 flex-col bg-zinc-950 px-4 py-6 dark:border-r dark:border-white/5 lg:flex">
         <div className="px-2">
           <Logo />
         </div>
@@ -56,21 +57,25 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
+        <div className="mb-3">
+          <ThemeToggle />
+        </div>
         <div className="rounded-xl bg-white/5 px-3 py-3 text-xs text-zinc-400">
           <p className="font-medium text-zinc-200">Versão de demonstração</p>
           <p className="mt-0.5">Dados fictícios para validação.</p>
         </div>
       </aside>
 
-      <header className="sticky top-0 z-30 flex h-14 items-center bg-zinc-950 px-4 lg:hidden">
+      <header className="palette-fixed sticky top-0 z-30 flex h-14 items-center justify-between bg-zinc-950 pl-4 pr-2 dark:border-b dark:border-white/5 lg:hidden">
         <Logo />
+        <ThemeToggle variant="icon" />
       </header>
 
       <main className="px-4 pb-28 pt-6 sm:px-6 lg:ml-64 lg:px-10 lg:pb-12 lg:pt-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-zinc-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-zinc-200 bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
         {NAV.map(({ href, short, icon: Icon }) => (
           <Link
             key={href}

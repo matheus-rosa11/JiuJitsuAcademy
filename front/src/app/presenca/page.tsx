@@ -83,7 +83,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
               onClick={() => confirmLeave() && setClassId(c.id)}
               className={cn(
                 "flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 text-left ring-1 transition-all",
-                c.id === classId ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white text-zinc-700 ring-zinc-200 hover:ring-zinc-400",
+                c.id === classId ? "bg-zinc-900 text-zinc-50 ring-zinc-900" : "bg-surface text-zinc-700 ring-zinc-200 hover:ring-zinc-400",
               )}
             >
               {today && <span className="size-2 rounded-full bg-emerald-400" title="Tem aula hoje" />}
@@ -177,7 +177,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
                     onClick={() => setPresence({ [s.studentId]: !present })}
                     className={cn(
                       "flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-2xl px-4 py-3 text-left ring-1 transition-all active:scale-[0.99]",
-                      present ? "bg-emerald-50 ring-2 ring-emerald-500" : "bg-white ring-zinc-200 hover:ring-zinc-300",
+                      present ? "bg-emerald-50 ring-2 ring-emerald-500" : "bg-surface ring-zinc-200 hover:ring-zinc-300",
                     )}
                   >
                     <Avatar name={s.name} tone={s.studentType === "Child" ? "sky" : "zinc"} />
