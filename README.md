@@ -65,7 +65,9 @@ npm install
 npm run dev                             # http://localhost:3000
 ```
 
-O frontend usa `API_URL=http://localhost:5106` por padrão (veja `front/.env.example`).
+Localmente não é preciso `.env`: o front usa `API_URL=http://localhost:5106` por padrão e a API usa a connection
+string de `appsettings.Development.json`. Os arquivos `api/.env.example` e `front/.env.example` contêm as variáveis
+de referência da Railway, que ela sugere importar ao conectar o repositório.
 
 Criar uma nova migration (a partir de `api/`):
 
@@ -126,7 +128,7 @@ redeployar o serviço cuja pasta mudou). Os três serviços ficam no **mesmo pro
 
 | Serviço | Variável         | Obrigatória | Descrição |
 | ------- | ---------------- | ----------- | --------- |
-| api     | `DATABASE_URL`   | sim         | URL `postgresql://user:pass@host:port/db` (formato da Railway). Localmente usa `ConnectionStrings:DefaultConnection` de `appsettings.Development.json`. |
+| api     | `DATABASE_URL`   | sim         | Referência `${{Postgres.DATABASE_URL}}` (URL `postgresql://user:pass@host:port/db`). Alternativa: referências para `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`. Localmente usa `ConnectionStrings:DefaultConnection` de `appsettings.Development.json`. |
 | api     | `PORT`           | sim (Railway) | Porta HTTP. Definir explicitamente permite usar `${{api.PORT}}` no front. A API escuta em IPv4 e IPv6 (exigido pela rede privada). |
 | api     | `SEED_DEMO_DATA` | não         | `false` desativa os dados fictícios. As faixas são sempre criadas. Os dados de demo só entram se não houver alunos. |
 | api     | `CORS_ORIGINS`   | não         | Lista separada por vírgula. Só necessária se algum cliente chamar a API direto do navegador (o front usa proxy no servidor). |

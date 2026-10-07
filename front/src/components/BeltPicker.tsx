@@ -15,7 +15,7 @@ export function BeltPicker({ belts, value, onChange }: { belts: Belt[]; value: s
           onClick={() => onChange(belt.id)}
           className={cn(
             "flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm ring-1 transition-all",
-            value === belt.id ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white text-zinc-700 ring-zinc-200 hover:ring-zinc-400",
+            value === belt.id ? "bg-zinc-900 text-zinc-50 ring-zinc-900" : "bg-surface text-zinc-700 ring-zinc-200 hover:ring-zinc-400",
           )}
         >
           <BeltBadge name={belt.name} size="sm" />
@@ -36,7 +36,7 @@ export function DegreePicker({ max, value, onChange }: { max: number; value: num
           onClick={() => onChange(degree)}
           className={cn(
             "h-11 min-w-11 cursor-pointer rounded-xl px-3 text-sm font-medium ring-1 transition-all",
-            value === degree ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white text-zinc-700 ring-zinc-200 hover:ring-zinc-400",
+            value === degree ? "bg-zinc-900 text-zinc-50 ring-zinc-900" : "bg-surface text-zinc-700 ring-zinc-200 hover:ring-zinc-400",
           )}
         >
           {degree === 0 ? "Sem grau" : `${degree}º`}

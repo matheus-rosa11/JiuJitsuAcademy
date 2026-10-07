@@ -21,7 +21,7 @@ export function GraduationTimeline({ graduations }: { graduations: Graduation[] 
             {!last && <span className="absolute left-[11px] top-7 h-[calc(100%-1.25rem)] w-px bg-zinc-200" />}
             <span
               className={cn(
-                "relative z-10 mt-1 flex shrink-0 items-center justify-center rounded-full ring-4 ring-white",
+                "relative z-10 mt-1 flex shrink-0 items-center justify-center rounded-full ring-4 ring-surface",
                 isBelt ? "size-6" : "ml-1.5 mr-1.5 mt-2 size-3 bg-zinc-300",
               )}
               style={isBelt ? { background: beltLook(g.beltName).main, boxShadow: "inset 0 0 0 1px rgba(0,0,0,.15)" } : undefined}

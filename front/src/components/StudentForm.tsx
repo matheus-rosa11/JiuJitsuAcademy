@@ -161,13 +161,13 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
               onClick={() => changeType(o.value)}
               className={cn(
                 "flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-left ring-1 transition-all",
-                type === o.value ? "bg-zinc-900 text-white ring-zinc-900" : "bg-white ring-zinc-200 hover:ring-zinc-400",
+                type === o.value ? "bg-zinc-900 text-zinc-50 ring-zinc-900" : "bg-surface ring-zinc-200 hover:ring-zinc-400",
               )}
             >
               <o.icon className="size-6 shrink-0" />
               <div>
                 <p className="font-semibold">{o.label}</p>
-                <p className={cn("text-xs", type === o.value ? "text-zinc-300" : "text-zinc-500")}>{o.hint}</p>
+                <p className={cn("text-xs", type === o.value ? "text-zinc-400" : "text-zinc-500")}>{o.hint}</p>
               </div>
             </button>
           ))}
@@ -235,7 +235,7 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
               <div key={r.key} className="rounded-2xl bg-zinc-50 p-4 ring-1 ring-zinc-200/70">
                 <div className="grid gap-3 sm:grid-cols-[1fr_180px]">
                   {r.responsibleId ? (
-                    <div className="flex h-11 items-center rounded-xl bg-white px-3.5 text-sm font-medium ring-1 ring-zinc-200">
+                    <div className="flex h-11 items-center rounded-xl bg-surface px-3.5 text-sm font-medium ring-1 ring-zinc-200">
                       {r.name}
                       <span className="ml-2 text-xs font-normal text-zinc-500">{r.phone}</span>
                     </div>
@@ -365,7 +365,7 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
         </div>
       </Section>
 
-      <div className="sticky bottom-20 z-20 flex justify-end gap-2 rounded-2xl bg-white/90 p-3 ring-1 ring-zinc-200 backdrop-blur lg:bottom-4">
+      <div className="sticky bottom-20 z-20 flex justify-end gap-2 rounded-2xl bg-surface/90 p-3 ring-1 ring-zinc-200 backdrop-blur lg:bottom-4">
         <Button type="button" variant="secondary" onClick={() => router.back()}>
           Cancelar
         </Button>

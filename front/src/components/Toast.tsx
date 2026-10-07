@@ -25,7 +25,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="animate-toast pointer-events-auto flex max-w-md items-center gap-2.5 rounded-2xl bg-zinc-900 px-4 py-3 text-sm text-white shadow-xl"
+            className="palette-fixed animate-toast pointer-events-auto flex max-w-md items-center gap-2.5 rounded-2xl bg-zinc-900 px-4 py-3 text-sm text-white shadow-xl dark:ring-1 dark:ring-white/10"
           >
             {t.tone === "success" ? (
               <CircleCheck className="size-5 shrink-0 text-emerald-400" />

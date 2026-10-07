@@ -1,11 +1,94 @@
 @import "tailwindcss";
 
+/* The theme lives in <html data-theme="..."> (set before paint by the inline script in layout.tsx). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+@theme {
+  /* Cards, inputs, modals. Use instead of bg-white so it follows the theme. */
+  --color-surface: #fff;
+}
+
+/*
+ * Dark mode remaps the palette instead of sprinkling dark: variants everywhere:
+ * the zinc scale is inverted (bg-zinc-900 + text-zinc-50 becomes a light button on a dark page)
+ * and the light status tints become translucent tints of the same hue.
+ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-surface: oklch(19.5% 0.005 285.9);
+
+  --color-zinc-50: oklch(15.5% 0.005 285.8);
+  --color-zinc-100: oklch(24.5% 0.006 286);
+  --color-zinc-200: oklch(29% 0.007 286);
+  --color-zinc-300: oklch(37% 0.01 286);
+  --color-zinc-400: oklch(55.2% 0.016 286);
+  --color-zinc-500: oklch(68% 0.015 286);
+  --color-zinc-600: oklch(76% 0.012 286);
+  --color-zinc-700: oklch(84% 0.008 286);
+  --color-zinc-800: oklch(90% 0.005 286);
+  --color-zinc-900: oklch(95.5% 0.003 286);
+  --color-zinc-950: oklch(98.5% 0 0);
+
+  --color-emerald-50: color-mix(in oklab, oklch(69.6% 0.17 162.48) 12%, transparent);
+  --color-emerald-100: color-mix(in oklab, oklch(69.6% 0.17 162.48) 18%, transparent);
+  --color-emerald-200: color-mix(in oklab, oklch(69.6% 0.17 162.48) 30%, transparent);
+  --color-emerald-700: oklch(80% 0.15 163);
+
+  --color-amber-50: color-mix(in oklab, oklch(76.9% 0.188 70.08) 12%, transparent);
+  --color-amber-100: color-mix(in oklab, oklch(76.9% 0.188 70.08) 18%, transparent);
+  --color-amber-200: color-mix(in oklab, oklch(76.9% 0.188 70.08) 30%, transparent);
+  --color-amber-700: oklch(82.8% 0.189 84.429);
+  --color-amber-800: oklch(87.9% 0.169 91.605);
+
+  --color-red-50: color-mix(in oklab, oklch(63.7% 0.237 25.331) 12%, transparent);
+  --color-red-200: color-mix(in oklab, oklch(63.7% 0.237 25.331) 30%, transparent);
+  --color-red-600: oklch(68% 0.2 23);
+  --color-red-700: oklch(76% 0.15 20);
+
+  --color-sky-50: color-mix(in oklab, oklch(68.5% 0.169 237.323) 12%, transparent);
+  --color-sky-100: color-mix(in oklab, oklch(68.5% 0.169 237.323) 18%, transparent);
+  --color-sky-200: color-mix(in oklab, oklch(68.5% 0.169 237.323) 30%, transparent);
+  --color-sky-700: oklch(82.8% 0.111 230.318);
+
+  --color-violet-50: color-mix(in oklab, oklch(60.6% 0.25 292.717) 14%, transparent);
+  --color-violet-200: color-mix(in oklab, oklch(60.6% 0.25 292.717) 32%, transparent);
+  --color-violet-700: oklch(81.1% 0.111 293.571);
+}
+
+/* Always-dark chrome (sidebar, mobile header, toasts): keeps the original zinc scale in both themes. */
+.palette-fixed {
+  --color-zinc-200: oklch(92% 0.004 286.32);
+  --color-zinc-400: oklch(70.5% 0.015 286.067);
+  --color-zinc-900: oklch(21% 0.006 285.885);
+  --color-zinc-950: oklch(14.1% 0.005 285.823);
+}
+
 body {
   @apply bg-zinc-50 text-zinc-900;
+}
+
+/* Theme switch: circular reveal from the toggle (animated in ThemeToggle.tsx). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Fallback for browsers without View Transitions: a short cross-fade of colors. */
+[data-theme-fade] *,
+[data-theme-fade] *::before,
+[data-theme-fade] *::after {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease,
+    fill 300ms ease !important;
 }
 
 @keyframes toast-in {
