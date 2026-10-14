@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { BeltBadge, BeltLabel } from "@/components/BeltBadge";
+import { ClassPhotoRoll } from "@/components/ClassPhotoRoll";
 import { useToast } from "@/components/Toast";
 import { Avatar, Badge, Button, buttonClass, Card, cn, EmptyState, ErrorState, Input, PageHeader, ProgressBar, Segmented, Select, Spinner, rateTone } from "@/components/ui";
 import { api, type AttendanceSheet, type StudentFrequency, type TrainingClass } from "@/lib/api";
+import { absenceWarning } from "@/lib/classPhoto";
 import { addDays, formatDate, formatDays, todayIso, WEEKDAYS, WEEKDAYS_FULL, weekdayOf } from "@/lib/format";
 import { useApi } from "@/lib/useApi";
 
@@ -22,6 +24,10 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
   const [date, setDate] = useState(todayIso());
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
+  const [photoSession, setPhotoSession] = useState(0);
+  const [photoActive, setPhotoActive] = useState(false);
+  const [photoStatus, setPhotoStatus] = useState<Record<string, { status: string; reason: string }>>({});
+  const [unconfirmed, setUnconfirmed] = useState<string[]>([]);
 
   const sheetPath = classId ? `/attendance/sheet?classId=${classId}&date=${date}` : null;
   const { data: sheet, error, reload } = useApi<AttendanceSheet>(sheetPath);
@@ -39,12 +45,36 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
     setMarks({ key: sheetPath!, values: { ...changes, ...values } });
   }
 
+  function resetPhoto() {
+    setPhotoSession((current) => current + 1);
+    setPhotoActive(false);
+    setPhotoStatus({});
+    setUnconfirmed([]);
+  }
+
   function confirmLeave() {
     return !dirty || confirm("Há alterações não salvas na chamada. Descartar?");
   }
 
+  function changeClass(id: string) {
+    if (id === classId || !confirmLeave()) return;
+    setClassId(id);
+    resetPhoto();
+  }
+
+  function changeDate(next: string) {
+    if (!next || next === date || next > todayIso() || !confirmLeave()) return;
+    setDate(next);
+    resetPhoto();
+  }
+
   async function save() {
     if (!currentSheet) return;
+    if (photoActive) {
+      const unmarked = currentSheet.students.filter((student) => !isPresent(student) && unconfirmed.includes(student.studentId));
+      const warning = absenceWarning(unmarked.map((student) => student.name));
+      if (warning && !confirm(warning)) return;
+    }
     setSaving(true);
     try {
       await api("/attendance", {
@@ -80,7 +110,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
           return (
             <button
               key={c.id}
-              onClick={() => confirmLeave() && setClassId(c.id)}
+              onClick={() => changeClass(c.id)}
               className={cn(
                 "flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl px-4 py-3 text-left ring-1 transition-all",
                 c.id === classId ? "bg-zinc-900 text-zinc-50 ring-zinc-900" : "bg-surface text-zinc-700 ring-zinc-200 hover:ring-zinc-400",
@@ -99,7 +129,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
       </div>
 
       <Card className="flex items-center gap-2 p-2">
-        <Button variant="ghost" size="sm" onClick={() => confirmLeave() && setDate(addDays(date, -1))} aria-label="Dia anterior">
+        <Button variant="ghost" size="sm" onClick={() => changeDate(addDays(date, -1))} aria-label="Dia anterior">
           <ChevronLeft className="size-5" />
         </Button>
         <label className="relative flex flex-1 cursor-pointer items-center justify-center gap-2 text-center">
@@ -110,16 +140,16 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
             type="date"
             value={date}
             max={todayIso()}
-            onChange={(e) => e.target.value && confirmLeave() && setDate(e.target.value)}
+            onChange={(e) => e.target.value && changeDate(e.target.value)}
             className="absolute inset-0 cursor-pointer opacity-0"
           />
         </label>
         {date !== todayIso() && (
-          <Button variant="secondary" size="sm" onClick={() => confirmLeave() && setDate(todayIso())}>
+          <Button variant="secondary" size="sm" onClick={() => changeDate(todayIso())}>
             Hoje
           </Button>
         )}
-        <Button variant="ghost" size="sm" onClick={() => confirmLeave() && setDate(addDays(date, 1))} disabled={date >= todayIso()} aria-label="Próximo dia">
+        <Button variant="ghost" size="sm" onClick={() => changeDate(addDays(date, 1))} disabled={date >= todayIso()} aria-label="Próximo dia">
           <ChevronRight className="size-5" />
         </Button>
       </Card>
@@ -141,6 +171,18 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
         </Card>
       ) : (
         <>
+          <ClassPhotoRoll
+            key={photoSession}
+            students={currentSheet.students.map((student) => ({ studentId: student.studentId, name: student.name }))}
+            onApply={(present) => {
+              setPresence(present);
+              const count = Object.keys(present).length;
+              toast(count === 1 ? "1 presença sugerida aplicada. Ela ainda não foi salva." : `${count} presenças sugeridas aplicadas. Elas ainda não foram salvas.`);
+            }}
+            onPhotoActive={setPhotoActive}
+            onStatuses={setPhotoStatus}
+            onUnconfirmed={setUnconfirmed}
+          />
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex-1">
               <p className="text-lg font-semibold text-zinc-900">
@@ -186,6 +228,10 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
                       <div className="mt-1 flex items-center gap-2">
                         <BeltBadge name={s.beltName} degree={s.degree} size="sm" />
                         <span className="text-xs text-zinc-500">{s.beltName}</span>
+                        {photoStatus[s.studentId]?.status === "suggested" && <span className="text-xs font-medium text-emerald-700">sugerido</span>}
+                        {photoStatus[s.studentId]?.status === "review" && <span className="text-xs font-medium text-amber-700">revisar</span>}
+                        {photoStatus[s.studentId]?.reason === "not_seen" && <span className="text-xs font-medium text-amber-700">pendente</span>}
+                        {photoStatus[s.studentId]?.reason === "no_profile" && <span className="text-xs font-medium text-zinc-500">sem cadastro facial</span>}
                       </div>
                     </div>
                     <span

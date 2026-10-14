@@ -76,7 +76,7 @@ python3 -m venv .venv
 
 O primeiro uso baixa o pacote `buffalo_l` para `~/.insightface/models` (cerca de 280 MB). Sem este processo, a academia funciona; a ficha do aluno só avisa que o cadastro facial está indisponível.
 
-Depois de criar um aluno, a tela guiada abre em `/alunos/{id}/rosto`. A tela técnica, fora do menu, é `/demo/facial`. O contrato para o futuro sistema de presença está em `docs/AI_INTEGRATION_GUIDE.md`.
+Depois de criar um aluno, a tela guiada abre em `/alunos/{id}/rosto`. A tela técnica, fora do menu, é `/demo/facial`. Na chamada (`/presenca`), “Tirar foto” sugere presenças só entre os alunos daquela turma. O contrato está em `docs/AI_INTEGRATION_GUIDE.md`. A avaliação com fotos coletivas e métricas está em `docs/CLASS_PHOTO_EVAL.md`; sem um dataset autorizado o resultado permanece incompleto.
 
 Localmente não é preciso `.env`: o front usa `API_URL=http://localhost:5106` por padrão e a API usa a connection
 string de `appsettings.Development.json`. Os arquivos `api/.env.example` e `front/.env.example` contêm as variáveis

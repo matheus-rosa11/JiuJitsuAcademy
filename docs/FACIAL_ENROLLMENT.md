@@ -111,7 +111,9 @@ Na foto de exemplo da biblioteca, o mesmo recorte comparado com o próprio perfi
 
 ## O que este POC não prova ainda
 
-A foto de exemplo do InsightFace é uma foto de grupo com pessoas diferentes. O recorte da esquerda é o espelho de outra pessoa, não uma terceira vista do mesmo aluno. Os testes provam as travas de pose, a troca do perfil e que um rosto estranho não passa do limiar. Eles não medem, com a mesma pessoa, o quanto as três vistas melhoram uma foto de treino. Essa medida pede um conjunto em que a mesma identidade apareça de frente e de lado.
+A foto de exemplo do InsightFace é uma foto de grupo com pessoas diferentes. O recorte da esquerda é o espelho de outra pessoa, não uma terceira vista do mesmo aluno. Os testes provam as travas de pose, a troca do perfil e que um rosto estranho não passa do limiar. Eles não medem, com a mesma pessoa, o quanto as três vistas melhoram uma foto de treino.
+
+A chamada usa `POST /faces/attendance` com a lista da turma. Quem não foi visto fica pendente, não ausente. Medir acerto, erro e trabalho manual numa foto real de treino é o procedimento de `docs/CLASS_PHOTO_EVAL.md`. Esse conjunto ainda não está no repositório, então a pergunta da chamada coletiva continua sem resposta numérica.
 
 ## Liveness
 

@@ -39,23 +39,28 @@ O navegador chama `/api/faces/...`. O route `front/src/app/api/faces/[...path]/r
 | `DELETE` | `/faces/{student_id}` | Remove o perfil |
 | `GET` | `/faces/{student_id}` | Metadados. `?embeddings=true` inclui os vetores |
 | `POST` | `/faces/recognize` | Rostos da foto contra os candidatos |
+| `POST` | `/faces/attendance` | Sugestão de chamada só com a lista da turma. Não grava presença |
 | `GET` | `/faces/demo/samples` | Fotos de exemplo da biblioteca, não são alunos |
 | `GET` | `/health` | Saúde do processo |
 
 O `studentId` é o mesmo identificador do aluno na API .NET. O face service não consulta o Postgres e não exige que o aluno exista lá.
 
-## Presença no sistema futuro
+## Presença a partir da foto da turma
 
 ```text
 Aluno → este enrollment → Face Profile
-Treino → foto da turma → POST /faces/recognize
-         com candidateStudentIds = alunos daquela turma
-         → MATCHED / REVIEW / UNKNOWN
-         → professor confirma
+Treino → tela Presença da turma → Tirar foto
+         → POST /faces/attendance
+         com candidateStudentIds = alunos daquela lista
+         → suggested / review / unknown
+         → aluno não visto fica pending, não ausente
+         → professor corrige e confirma
          → presença na API .NET
 ```
 
-`REVIEW` e `UNKNOWN` não marcam presença. `MATCHED` também é sugestão: quem confirma é o professor.
+A tela é a chamada em `/presenca`. “Aplicar presenças sugeridas” só marca presença. Não desmarca ninguém. Salvar a folha ainda envia verdadeiro ou falso para a API .NET; a interface pede confirmação quando isso gravaria ausência de quem a foto não confirmou.
+
+A avaliação desse fluxo está em `docs/CLASS_PHOTO_EVAL.md`. Sem um conjunto de fotos de treino autorizado e separado do cadastro, o relatório fica `incomplete`.
 
 ## O que fica de fora
 
