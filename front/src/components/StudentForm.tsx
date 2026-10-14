@@ -135,8 +135,12 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
         method: isEdit ? "PUT" : "POST",
         body,
       });
-      toast(isEdit ? "Aluno atualizado." : `${saved.name} cadastrado com sucesso!`);
-      router.push(`/alunos/${saved.id}`);
+      if (isEdit) {
+        toast("Aluno atualizado.");
+        router.push(`/alunos/${saved.id}`);
+      } else {
+        router.push(`/alunos/${saved.id}/rosto`);
+      }
     } catch (err) {
       toast((err as Error).message, "error");
       setSaving(false);
