@@ -98,11 +98,54 @@ O cadastro pode ser refeito com outro `POST /faces/enroll` quando a foto de trei
 
 ## Como restringir candidatos à turma
 
-Passe em `candidateStudentIds` somente os alunos da turma daquela aula. Um rosto de outra turma não deve aparecer como sugestão. Sem essa lista, o serviço considera a academia inteira.
+Passe em `candidateStudentIds` somente os alunos da turma daquela aula. Um rosto de outra turma não deve aparecer como sugestão. Sem essa lista, `/faces/recognize` considera a academia inteira.
+
+## Como sugerir a chamada a partir da foto da turma
+
+Na tela de presença da turma, o professor usa “Tirar foto” ou “Enviar foto”. O cliente envia essa imagem e os alunos que já estão na lista daquela turma.
+
+`POST /faces/attendance`
+
+```json
+{
+  "imageBase64": "<foto coletiva>",
+  "candidateStudentIds": ["id-1", "id-2"]
+}
+```
+
+`candidateStudentIds` é obrigatório. Não há fallback para a academia inteira. Lista vazia devolve os rostos como desconhecidos e nenhum aluno.
+
+A rota não grava presença na API .NET. Ela devolve sugestões.
+
+Cada rosto em `faces` tem `role`:
+
+| `role` | Significado |
+| --- | --- |
+| `suggested` | Um único `MATCHED`, sem outro rosto reivindicando a mesma pessoa. Pode ser aplicado como presença depois que o professor aceitar. |
+| `review` | `REVIEW`, dois nomes muito próximos, ou dois rostos apontando para o mesmo aluno. Mostrar a dúvida. Não marcar presença sozinho. |
+| `unknown` | Sem nome. Não forçar um aluno da lista. O professor pode atribuir, se reconhecer a pessoa. |
+
+Cada aluno da lista em `students` tem `status`:
+
+| `status` | `reason` | O que mostrar |
+| --- | --- | --- |
+| `suggested` | `matched` | Presença sugerida |
+| `review` | `needs_review` | Revisão manual |
+| `pending` | `no_profile` | Sem cadastro facial. Não é falta |
+| `pending` | `not_seen` | A foto não confirmou essa pessoa. Não é falta |
+
+Não existe status de ausência. Alguém pode estar no treino e ainda assim ficar de fora do enquadramento, de costas, encoberto ou com o rosto pequeno demais. A confirmação final é do professor.
+
+`counts` resume sugestões, revisões, pendências e rostos desconhecidos. `elapsedMs` é o tempo daquela foto.
+
+Baixa confiança continua sendo `review` ou `unknown`. Não rebaixe o limiar no sistema principal.
+
+Ao salvar a chamada, a API .NET grava `present: true` ou `present: false` para cada aluno. `false` vira ausência registrada. Por isso a tela pede confirmação antes de salvar quem a foto não confirmou e o professor não marcou. A foto, sozinha, não deve disparar essa gravação.
 
 ## O que não fazer
 
 - Não rodar InsightFace, MediaPipe ou outro modelo de embedding no sistema principal.
 - Não guardar uma foto de perfil e “reconhecer depois” com outra biblioteca.
 - Não tratar o giro da cabeça como prova de vida. Este serviço não faz anti-spoofing.
-- Não marcar presença em `REVIEW` ou `UNKNOWN`.
+- Não marcar presença em `REVIEW`, `review` ou `UNKNOWN`.
+- Não marcar falta porque o rosto não apareceu na foto.
