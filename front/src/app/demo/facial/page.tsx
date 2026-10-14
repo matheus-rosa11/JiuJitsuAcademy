@@ -194,6 +194,7 @@ export default function FacialDemoPage() {
                   onClick={() => {
                     setShots([]);
                     setFaces(null);
+                    setProfile(null);
                     setAttempt((value) => value + 1);
                   }}
                 >
