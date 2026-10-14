@@ -108,3 +108,36 @@ export function recognizeFaces(imageBase64: string, candidateStudentIds?: string
     body: { imageBase64, candidateStudentIds },
   });
 }
+
+export interface AttendanceFace {
+  index: number;
+  box: number[] | null;
+  role: "suggested" | "review" | "unknown";
+  studentId: string | null;
+  score: number | null;
+  matchedPose: Pose | null;
+  ambiguous: boolean;
+  candidates: { studentId: string; score: number; decision: string; matchedPose: Pose }[];
+}
+
+export interface AttendanceStudent {
+  studentId: string;
+  status: "suggested" | "review" | "pending";
+  reason: "matched" | "needs_review" | "no_profile" | "not_seen";
+  faceIndex: number | null;
+  score: number | null;
+}
+
+export interface AttendanceSuggestion {
+  faces: AttendanceFace[];
+  students: AttendanceStudent[];
+  counts: { suggested: number; review: number; pending: number; unknownFaces: number };
+  elapsedMs: number;
+}
+
+export function suggestAttendance(imageBase64: string, candidateStudentIds: string[]) {
+  return faceApi<AttendanceSuggestion>("/attendance", {
+    method: "POST",
+    body: { imageBase64, candidateStudentIds },
+  });
+}
