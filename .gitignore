@@ -19,3 +19,13 @@ out/
 .DS_Store
 Thumbs.db
 .idea/
+
+# Face service
+face-service/.venv/
+face-service/data/
+**/__pycache__/
+**/*.py[cod]
+
+# MediaPipe assets copied by front/scripts/prepare-face-assets.mjs
+front/public/mediapipe/
+front/public/models/

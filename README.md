@@ -26,8 +26,11 @@ api/                     ASP.NET Core (um único projeto)
 front/                   Next.js
   src/app/               Páginas (Dashboard, Alunos, Turmas, Presença, Graduações, Financeiro)
   src/app/api/[...path]  Proxy para a API (o navegador nunca fala direto com a API)
+  src/app/api/faces/     Proxy para o serviço facial
   src/components/        Componentes reutilizáveis (ui.tsx, BeltBadge, StudentForm...)
   src/lib/               Tipos da API, hook useApi, formatação
+face-service/            FastAPI: cadastro facial e reconhecimento (não passa pela API .NET)
+docs/                    Contrato do enrollment para o sistema principal
 docker-compose.yml       PostgreSQL local
 ```
 
@@ -49,7 +52,7 @@ docker-compose.yml       PostgreSQL local
 
 ## Desenvolvimento local
 
-Pré-requisitos: .NET SDK 10, Node 22+, Docker.
+Pré-requisitos: .NET SDK 10, Node 22+, Docker. O cadastro facial também pede Python 3.12, `python3-dev` e `g++` (o InsightFace compila uma extensão na instalação).
 
 ```bash
 # 1. Banco (Postgres na porta 5433 para não conflitar com outro Postgres local)
@@ -63,7 +66,17 @@ dotnet run --launch-profile http        # http://localhost:5106 (health: /health
 cd front
 npm install
 npm run dev                             # http://localhost:3000
+
+# 4. Serviço facial (outro terminal) — cadastro e reconhecimento de rostos
+cd face-service
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 5110
 ```
+
+O primeiro uso baixa o pacote `buffalo_l` para `~/.insightface/models` (cerca de 280 MB). Sem este processo, a academia funciona; a ficha do aluno só avisa que o cadastro facial está indisponível.
+
+Depois de criar um aluno, a tela guiada abre em `/alunos/{id}/rosto`. A tela técnica, fora do menu, é `/demo/facial`. O contrato para o futuro sistema de presença está em `docs/AI_INTEGRATION_GUIDE.md`.
 
 Localmente não é preciso `.env`: o front usa `API_URL=http://localhost:5106` por padrão e a API usa a connection
 string de `appsettings.Development.json`. Os arquivos `api/.env.example` e `front/.env.example` contêm as variáveis
