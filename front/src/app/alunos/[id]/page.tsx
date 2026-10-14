@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { BeltBadge } from "@/components/BeltBadge";
+import { FaceProfileCard } from "@/components/FaceProfileCard";
 import { GraduationModal } from "@/components/GraduationModal";
 import { GraduationTimeline } from "@/components/GraduationTimeline";
 import { PaymentModal } from "@/components/PaymentModal";
@@ -98,6 +99,8 @@ export default function StudentPage() {
           </div>
         </div>
       </Card>
+
+      <FaceProfileCard studentId={student.id} studentName={student.name} />
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="p-5">
