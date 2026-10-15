@@ -106,6 +106,74 @@ body {
   animation: toast-in 180ms ease-out;
 }
 
+/* Enrollment camera stays dark in both themes. Hex colors avoid the inverted zinc scale. */
+.face-stage {
+  background: #070707;
+  color: #f4f4f5;
+  color-scheme: dark;
+}
+
+.face-start {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border: 0 !important;
+  background-color: #ffffff !important;
+  color: #141414 !important;
+}
+
+@keyframes face-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.82;
+  }
+  50% {
+    transform: scale(1.012);
+    opacity: 1;
+  }
+}
+
+@keyframes face-scan {
+  0% {
+    transform: translateY(-8rem);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.55;
+  }
+  78% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(8rem);
+    opacity: 0;
+  }
+}
+
+@keyframes face-spot {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.animate-face-breathe {
+  animation: face-breathe 4.4s ease-in-out infinite;
+}
+
+.animate-face-scan {
+  animation: face-scan 3.4s ease-in-out infinite;
+}
+
+.animate-face-spot {
+  animation: face-spot 1.05s ease-out 3;
+}
+
 .scrollbar-none {
   scrollbar-width: none;
 }
