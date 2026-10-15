@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, Clock, Pencil, Plus, School, Users } from "lucide-react";
+import { Baby, CalendarCheck, Clock, Pencil, Plus, School, User, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useToast } from "@/components/Toast";
@@ -109,6 +109,71 @@ function ClassModal({ initial, onClose, onSaved }: { initial?: TrainingClass; on
   );
 }
 
+const GROUPS = [
+  { key: "Adult", title: "Adulto", icon: User },
+  { key: "Child", title: "Infantil", icon: Baby },
+  { key: "all", title: "Todos", icon: Users },
+] as const;
+
+function classGroups(classes: TrainingClass[]) {
+  return GROUPS.map((group) => ({
+    ...group,
+    items: classes
+      .filter((item) => (item.targetStudentType ?? "all") === group.key)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime) || a.name.localeCompare(b.name, "pt-BR")),
+  })).filter((group) => group.items.length > 0);
+}
+
+function ClassCard({ item, today, onEdit }: { item: TrainingClass; today: number; onEdit: () => void }) {
+  const isToday = item.active && item.daysOfWeek.includes(today);
+  return (
+    <Card className={cn("flex flex-col p-5", !item.active && "opacity-60")}>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h3 className="font-semibold text-zinc-900">{item.name}</h3>
+          {item.description && <p className="mt-0.5 text-sm text-zinc-500">{item.description}</p>}
+        </div>
+        <button onClick={onEdit} className="cursor-pointer rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700" aria-label={`Editar ${item.name}`}>
+          <Pencil className="size-4" />
+        </button>
+      </div>
+
+      <div className="mt-4 flex gap-1">
+        {WEEKDAYS.map((label, day) => (
+          <span
+            key={day}
+            className={cn(
+              "flex h-8 flex-1 items-center justify-center rounded-lg text-xs font-medium",
+              item.daysOfWeek.includes(day) ? "bg-zinc-900 text-zinc-50" : "bg-zinc-50 text-zinc-300",
+              day === today && "ring-2 ring-emerald-400 ring-offset-1",
+            )}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-600">
+        <span className="flex items-center gap-1.5">
+          <Clock className="size-4 text-zinc-400" />
+          {item.startTime} – {item.endTime}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Users className="size-4 text-zinc-400" />
+          {item.enrolledCount} alunos
+        </span>
+        {!item.active && <Badge>Inativa</Badge>}
+      </div>
+
+      <div className="mt-5 flex-1" />
+      <Link href={`/presenca?turma=${item.id}`} className={buttonClass({ variant: isToday ? "success" : "secondary", className: "w-full" })}>
+        <CalendarCheck className="size-4" />
+        {isToday ? "Fazer chamada de hoje" : "Abrir chamada"}
+      </Link>
+    </Card>
+  );
+}
+
 export default function ClassesPage() {
   const { data: classes, error, reload } = useApi<TrainingClass[]>("/classes");
   const [editing, setEditing] = useState<{ item?: TrainingClass } | null>(null);
@@ -136,55 +201,22 @@ export default function ClassesPage() {
           <EmptyState icon={<School className="size-6" />} title="Nenhuma turma cadastrada" action={<Button onClick={() => setEditing({})}>Criar turma</Button>} />
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {classes.map((c) => {
-            const isToday = c.active && c.daysOfWeek.includes(today);
+        <div className="space-y-8">
+          {classGroups(classes).map((group) => {
+            const Icon = group.icon;
             return (
-              <Card key={c.id} className={cn("flex flex-col p-5", !c.active && "opacity-60")}>
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h2 className="font-semibold text-zinc-900">{c.name}</h2>
-                    {c.description && <p className="mt-0.5 text-sm text-zinc-500">{c.description}</p>}
-                  </div>
-                  <button onClick={() => setEditing({ item: c })} className="cursor-pointer rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700" aria-label="Editar turma">
-                    <Pencil className="size-4" />
-                  </button>
+              <section key={group.key} className="space-y-3">
+                <div className="flex items-center gap-2 border-b border-zinc-200 pb-2">
+                  <Icon className="size-4 text-zinc-500" />
+                  <h2 className="text-sm font-semibold tracking-tight text-zinc-900">{group.title}</h2>
+                  <span className="text-xs text-zinc-500">{group.items.length}</span>
                 </div>
-
-                <div className="mt-4 flex gap-1">
-                  {WEEKDAYS.map((label, day) => (
-                    <span
-                      key={day}
-                      className={cn(
-                        "flex h-8 flex-1 items-center justify-center rounded-lg text-xs font-medium",
-                        c.daysOfWeek.includes(day) ? "bg-zinc-900 text-zinc-50" : "bg-zinc-50 text-zinc-300",
-                        day === today && "ring-2 ring-emerald-400 ring-offset-1",
-                      )}
-                    >
-                      {label}
-                    </span>
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {group.items.map((item) => (
+                    <ClassCard key={item.id} item={item} today={today} onEdit={() => setEditing({ item })} />
                   ))}
                 </div>
-
-                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-600">
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="size-4 text-zinc-400" />
-                    {c.startTime} – {c.endTime}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Users className="size-4 text-zinc-400" />
-                    {c.enrolledCount} alunos
-                  </span>
-                  {c.targetStudentType && <Badge tone={c.targetStudentType === "Child" ? "blue" : "zinc"}>{c.targetStudentType === "Child" ? "Infantil" : "Adulto"}</Badge>}
-                  {!c.active && <Badge>Inativa</Badge>}
-                </div>
-
-                <div className="mt-5 flex-1" />
-                <Link href={`/presenca?turma=${c.id}`} className={buttonClass({ variant: isToday ? "success" : "secondary", className: "w-full" })}>
-                  <CalendarCheck className="size-4" />
-                  {isToday ? "Fazer chamada de hoje" : "Abrir chamada"}
-                </Link>
-              </Card>
+              </section>
             );
           })}
         </div>
