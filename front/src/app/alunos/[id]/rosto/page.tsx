@@ -24,7 +24,7 @@ export default function FaceEnrollmentPage() {
         <ArrowLeft className="size-4" /> {student.name}
       </Link>
       <h1 className="mb-1 text-center text-2xl font-semibold tracking-tight">Cadastrar meu rosto</h1>
-      <p className="mb-6 text-center text-sm text-zinc-500">Leva menos de um minuto. Siga as instruções na tela.</p>
+      <p className="mb-6 text-center text-sm text-zinc-600">Leva menos de um minuto. Siga as instruções na tela.</p>
       <FaceEnrollment
         studentId={id}
         source="camera"

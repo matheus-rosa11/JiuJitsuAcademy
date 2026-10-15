@@ -1,66 +1,44 @@
 "use client";
 
-import { Camera, Upload } from "lucide-react";
+import { Camera, ScanFace, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button, Card } from "@/components/ui";
-import { imageFileToDataUrl, presenceUpdates, type PhotoAssignment } from "@/lib/classPhoto";
-import { demoSamples, FaceApiError, suggestAttendance, type AttendanceFace, type AttendanceSuggestion } from "@/lib/faces";
+import { imageFileToDataUrl, photoRoll, type FaceReading } from "@/lib/classPhoto";
+import { demoSamples, FaceApiError, suggestAttendance, type AttendanceSuggestion } from "@/lib/faces";
 
 interface RosterStudent {
   studentId: string;
   name: string;
 }
 
-interface Assignment extends PhotoAssignment {
-  index: number;
-  role: AttendanceFace["role"];
-  box: number[] | null;
-}
-
 export function ClassPhotoRoll({
   students,
-  onApply,
-  onPhotoActive,
-  onStatuses,
-  onUnconfirmed,
+  onRecognized,
+  onFocus,
+  onClear,
 }: {
   students: RosterStudent[];
-  onApply: (present: Record<string, true>) => void;
-  onPhotoActive: (active: boolean) => void;
-  onStatuses: (statuses: Record<string, { status: string; reason: string }>) => void;
-  onUnconfirmed: (studentIds: string[]) => void;
+  onRecognized: (present: Record<string, true>, reading: Record<string, FaceReading>) => void;
+  onFocus: (studentId: string) => void;
+  onClear: () => void;
 }) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const names = new Map(students.map((student) => [student.studentId, student.name]));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sample, setSample] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [result, setResult] = useState<AttendanceSuggestion | null>(null);
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [natural, setNatural] = useState<{ width: number; height: number } | null>(null);
-
-  function publish(next: Assignment[], suggestion: AttendanceSuggestion | null) {
-    setAssignments(next);
-    const confirmed = new Set(next.filter((face) => face.accepted && face.studentId).map((face) => face.studentId as string));
-    onUnconfirmed(students.filter((student) => !confirmed.has(student.studentId)).map((student) => student.studentId));
-    onStatuses(
-      Object.fromEntries(
-        (suggestion?.students ?? []).map((student) => [student.studentId, { status: student.status, reason: student.reason }]),
-      ),
-    );
-  }
 
   function clearPhoto() {
     setPreview(null);
     setResult(null);
-    setAssignments([]);
     setNatural(null);
     setSample(false);
     setError(null);
-    onPhotoActive(false);
-    onUnconfirmed([]);
-    onStatuses({});
+    onClear();
   }
 
   async function submit(imageBase64: string, fromSample: boolean) {
@@ -71,19 +49,12 @@ export function ClassPhotoRoll({
         imageBase64,
         students.map((student) => student.studentId),
       );
-      const next = suggestion.faces.map((face) => ({
-        index: face.index,
-        role: face.role,
-        box: face.box,
-        studentId: face.studentId,
-        accepted: face.role === "suggested" && Boolean(face.studentId),
-      }));
+      const roll = photoRoll(suggestion.students, suggestion.faces);
       setPreview(imageBase64);
       setResult(suggestion);
       setSample(fromSample);
       setNatural(null);
-      onPhotoActive(true);
-      publish(next, suggestion);
+      onRecognized(roll.present, roll.reading);
     } catch (caught) {
       const message = caught instanceof FaceApiError ? caught.message : "Não conseguimos ler esta foto. Tente de novo.";
       setError(message);
@@ -117,24 +88,18 @@ export function ClassPhotoRoll({
     }
   }
 
-  function update(index: number, patch: Partial<Assignment>) {
-    if (!result) return;
-    publish(
-      assignments.map((face) => (face.index === index ? { ...face, ...patch } : face)),
-      result,
-    );
-  }
-
-  const decision = presenceUpdates(assignments);
-  const acceptedCount = decision.ok ? Object.keys(decision.present).length : 0;
+  const roll = result ? photoRoll(result.students, result.faces) : null;
   const seconds = result ? (result.elapsedMs / 1000).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : null;
+  const recognized = roll ? Object.values(roll.reading).filter((value) => value === "recognized").length : 0;
+  const review = roll ? Object.values(roll.reading).filter((value) => value === "review").length : 0;
+  const missing = roll ? Object.values(roll.reading).filter((value) => value === "missing" || value === "no_profile").length : 0;
 
   return (
     <Card className="space-y-4 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold text-zinc-900">Foto da turma</h2>
-          <p className="mt-1 text-sm text-zinc-600">A foto sugere presenças. Ela não marca falta.</p>
+          <p className="mt-1 max-w-md text-sm text-zinc-600">Quem for reconhecido entra como presente. Quem não aparecer fica sem presença.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" onClick={() => cameraRef.current?.click()} loading={busy}>
@@ -144,7 +109,7 @@ export function ClassPhotoRoll({
             <Upload className="size-4" /> Enviar foto
           </Button>
           {process.env.NODE_ENV === "development" && (
-            <Button type="button" size="sm" variant="ghost" onClick={loadSample} disabled={busy}>
+            <Button type="button" size="sm" variant="ghost" onClick={() => void loadSample()} disabled={busy}>
               Foto de exemplo (não é uma turma)
             </Button>
           )}
@@ -173,97 +138,67 @@ export function ClassPhotoRoll({
       />
       {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {sample && preview && (
-        <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Esta imagem é um exemplo da biblioteca. Não é uma foto da turma.
-        </p>
+        <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">Esta imagem é um exemplo da biblioteca. Não é uma foto da turma.</p>
       )}
-      {preview && result && (
-        <div className="space-y-4">
-          <div className="flex justify-center overflow-hidden rounded-xl bg-zinc-950">
+      {preview && result && roll && (
+        <div className="space-y-3">
+          <div className="flex justify-center overflow-hidden rounded-xl bg-black">
             <div className="relative max-w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={preview}
-              alt="Foto enviada para a chamada"
-              className="block max-h-[28rem] max-w-full"
-              onLoad={(event) => setNatural({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}
-            />
-            {natural &&
-              assignments.map((face) => {
-                if (!face.box || face.box.length < 4) return null;
-                const [x1, y1, x2, y2] = face.box;
-                const tone = face.role === "suggested" ? "border-emerald-400" : face.role === "review" ? "border-amber-400" : "border-white";
-                return (
-                  <span
-                    key={face.index}
-                    className={`pointer-events-none absolute border-2 ${tone}`}
-                    style={{
-                      left: `${(x1 / natural.width) * 100}%`,
-                      top: `${(y1 / natural.height) * 100}%`,
-                      width: `${((x2 - x1) / natural.width) * 100}%`,
-                      height: `${((y2 - y1) / natural.height) * 100}%`,
-                    }}
-                  />
-                );
-              })}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={preview}
+                alt="Foto enviada para a chamada"
+                className="block max-h-[28rem] max-w-full"
+                onLoad={(event) => setNatural({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}
+              />
+              {natural &&
+                result.faces.map((face) => {
+                  if (!face.box || face.box.length < 4) return null;
+                  const [x1, y1, x2, y2] = face.box;
+                  const linked = face.studentId && roll.reading[face.studentId] !== "missing" && roll.reading[face.studentId] !== "no_profile" ? face.studentId : null;
+                  const needsReview = linked ? roll.reading[linked] === "review" || face.role === "review" : false;
+                  const known = Boolean(linked) && face.role !== "unknown";
+                  const boxStyle = {
+                    left: `${(x1 / natural.width) * 100}%`,
+                    top: `${(y1 / natural.height) * 100}%`,
+                    width: `${((x2 - x1) / natural.width) * 100}%`,
+                    height: `${((y2 - y1) / natural.height) * 100}%`,
+                  };
+                  if (!known || !linked) {
+                    return (
+                      <span key={face.index} className="pointer-events-none absolute border-2 border-white" style={boxStyle}>
+                        <span className="absolute -top-2 left-1/2 flex size-5 -translate-x-1/2 items-center justify-center rounded-full bg-white text-xs font-semibold text-black">?</span>
+                      </span>
+                    );
+                  }
+                  return (
+                    <button
+                      key={face.index}
+                      type="button"
+                      className={`absolute border-2 ${needsReview ? "border-amber-300" : "border-emerald-300"}`}
+                      style={boxStyle}
+                      aria-label={`Ver ${names.get(linked) ?? "aluno"} na lista`}
+                      onClick={() => onFocus(linked)}
+                    >
+                      <span className={`absolute -top-2 left-1/2 flex size-5 -translate-x-1/2 items-center justify-center rounded-full ${needsReview ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>
+                        <ScanFace className="size-3.5" />
+                      </span>
+                    </button>
+                  );
+                })}
             </div>
           </div>
           <p className="text-sm text-zinc-600">
-            {result.counts.suggested} presenças sugeridas · {result.counts.review} para revisar · {result.counts.pending} pendentes ·{" "}
-            {result.counts.unknownFaces} {result.counts.unknownFaces === 1 ? "rosto desconhecido" : "rostos desconhecidos"}
-            {seconds ? ` · Leitura da foto: ${seconds} s` : ""}
+            {recognized} {recognized === 1 ? "reconhecido" : "reconhecidos"} · {review} para conferir · {missing} não {missing === 1 ? "está" : "estão"} na foto
+            {roll.unknownFaces > 0 ? ` · ${roll.unknownFaces} ${roll.unknownFaces === 1 ? "rosto" : "rostos"} com ?` : ""}
+            {seconds ? ` · ${seconds} s` : ""}
           </p>
           {result.faces.length === 0 && <p className="text-sm text-zinc-700">Não encontramos rostos nesta foto.</p>}
-          <ul className="space-y-2">
-            {assignments.map((face) => (
-              <li key={face.index} className="flex flex-col gap-2 rounded-xl bg-zinc-50 px-3 py-2 sm:flex-row sm:items-center">
-                <label className="flex items-center gap-2 text-sm text-zinc-800">
-                  <input
-                    type="checkbox"
-                    className="size-4 accent-emerald-600"
-                    checked={face.accepted}
-                    disabled={!face.studentId}
-                    onChange={(event) => update(face.index, { accepted: event.target.checked })}
-                  />
-                  {!face.studentId ? "Rosto não identificado" : face.role === "review" ? "Confira" : face.role === "unknown" ? "Atribuído pelo professor" : "Presença sugerida"}
-                </label>
-                <select
-                  className="h-10 flex-1 rounded-xl bg-white px-3 text-sm text-zinc-900 ring-1 ring-zinc-200"
-                  value={face.studentId ?? ""}
-                  onChange={(event) => {
-                    const studentId = event.target.value || null;
-                    update(face.index, {
-                      studentId,
-                      accepted: face.role === "unknown" ? Boolean(studentId) : face.accepted,
-                    });
-                  }}
-                  aria-label={`Aluno do rosto ${face.index + 1}`}
-                >
-                  <option value="">Não sei quem é</option>
-                  {students.map((student) => (
-                    <option key={student.studentId} value={student.studentId}>
-                      {student.name}
-                    </option>
-                  ))}
-                </select>
-              </li>
-            ))}
-          </ul>
-          {!decision.ok && <p className="text-sm text-red-700">{decision.message}</p>}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="success"
-              disabled={!decision.ok || acceptedCount === 0}
-              onClick={() => {
-                if (decision.ok) onApply(decision.present);
-              }}
-            >
-              Aplicar presenças sugeridas
-            </Button>
-            <Button type="button" variant="ghost" onClick={clearPhoto}>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-sm text-zinc-500">Toque no rosto verde ou amarelo para achar o aluno na lista.</p>
+            <button type="button" className="cursor-pointer text-sm text-zinc-500 underline-offset-2 hover:underline" onClick={clearPhoto}>
               Escolher outra foto
-            </Button>
+            </button>
           </div>
         </div>
       )}

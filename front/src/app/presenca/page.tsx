@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, CheckCheck, ChevronLeft, ChevronRight, CircleCheck, Info, RotateCcw, Search, Users } from "lucide-react";
+import { CalendarCheck, CheckCheck, ChevronLeft, ChevronRight, CircleCheck, Info, RotateCcw, ScanFace, Search, Users } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -9,7 +9,7 @@ import { ClassPhotoRoll } from "@/components/ClassPhotoRoll";
 import { useToast } from "@/components/Toast";
 import { Avatar, Badge, Button, buttonClass, Card, cn, EmptyState, ErrorState, Input, PageHeader, ProgressBar, Segmented, Select, Spinner, rateTone } from "@/components/ui";
 import { api, type AttendanceSheet, type StudentFrequency, type TrainingClass } from "@/lib/api";
-import { absenceWarning } from "@/lib/classPhoto";
+import { absenceWarning, type FaceReading } from "@/lib/classPhoto";
 import { addDays, formatDate, formatDays, todayIso, WEEKDAYS, WEEKDAYS_FULL, weekdayOf } from "@/lib/format";
 import { useApi } from "@/lib/useApi";
 
@@ -26,8 +26,9 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
   const [saving, setSaving] = useState(false);
   const [photoSession, setPhotoSession] = useState(0);
   const [photoActive, setPhotoActive] = useState(false);
-  const [photoStatus, setPhotoStatus] = useState<Record<string, { status: string; reason: string }>>({});
-  const [unconfirmed, setUnconfirmed] = useState<string[]>([]);
+  const [photoPresent, setPhotoPresent] = useState<Record<string, true>>({});
+  const [reading, setReading] = useState<Record<string, FaceReading>>({});
+  const [spotId, setSpotId] = useState<string | null>(null);
 
   const sheetPath = classId ? `/attendance/sheet?classId=${classId}&date=${date}` : null;
   const { data: sheet, error, reload } = useApi<AttendanceSheet>(sheetPath);
@@ -35,8 +36,12 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
 
   const currentSheet = sheet && sheet.classId === classId && sheet.date === date ? sheet : undefined;
   const changes = marks?.key === sheetPath ? marks.values : {};
-  const isPresent = (s: AttendanceSheet["students"][number]) => changes[s.studentId] ?? s.present;
-  const dirty = currentSheet?.students.some((s) => s.studentId in changes && changes[s.studentId] !== s.present) ?? false;
+  const isPresent = (s: AttendanceSheet["students"][number]) => {
+    if (s.studentId in changes) return changes[s.studentId];
+    if (photoActive && photoPresent[s.studentId]) return true;
+    return s.present;
+  };
+  const dirty = currentSheet?.students.some((s) => isPresent(s) !== s.present) ?? false;
   const presentCount = currentSheet?.students.filter(isPresent).length ?? 0;
   const selectedClass = classes.find((c) => c.id === classId);
   const meetsToday = selectedClass?.daysOfWeek.includes(weekdayOf(date));
@@ -48,8 +53,18 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
   function resetPhoto() {
     setPhotoSession((current) => current + 1);
     setPhotoActive(false);
-    setPhotoStatus({});
-    setUnconfirmed([]);
+    setPhotoPresent({});
+    setReading({});
+    setSpotId(null);
+  }
+
+  function focusStudent(studentId: string) {
+    setSearch("");
+    setSpotId(studentId);
+    window.setTimeout(() => {
+      document.getElementById(`aluno-${studentId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 40);
+    window.setTimeout(() => setSpotId((current) => (current === studentId ? null : current)), 1400);
   }
 
   function confirmLeave() {
@@ -71,7 +86,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
   async function save() {
     if (!currentSheet) return;
     if (photoActive) {
-      const unmarked = currentSheet.students.filter((student) => !isPresent(student) && unconfirmed.includes(student.studentId));
+      const unmarked = currentSheet.students.filter((student) => !isPresent(student) && reading[student.studentId] && reading[student.studentId] !== "recognized");
       const warning = absenceWarning(unmarked.map((student) => student.name));
       if (warning && !confirm(warning)) return;
     }
@@ -174,14 +189,20 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
           <ClassPhotoRoll
             key={photoSession}
             students={currentSheet.students.map((student) => ({ studentId: student.studentId, name: student.name }))}
-            onApply={(present) => {
-              setPresence(present);
+            onRecognized={(present, nextReading) => {
+              setPhotoPresent(present);
+              setReading(nextReading);
+              setPhotoActive(true);
               const count = Object.keys(present).length;
-              toast(count === 1 ? "1 presença sugerida aplicada. Ela ainda não foi salva." : `${count} presenças sugeridas aplicadas. Elas ainda não foram salvas.`);
+              const missed = Object.values(nextReading).filter((value) => value === "missing" || value === "no_profile").length;
+              toast(
+                count === 0
+                  ? "Ninguém foi reconhecido com certeza. A lista segue sem presença marcada pela foto."
+                  : `${count} ${count === 1 ? "presença marcada" : "presenças marcadas"} pela foto. ${missed} não estão na foto.`,
+              );
             }}
-            onPhotoActive={setPhotoActive}
-            onStatuses={setPhotoStatus}
-            onUnconfirmed={setUnconfirmed}
+            onFocus={focusStudent}
+            onClear={resetPhoto}
           />
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex-1">
@@ -210,28 +231,34 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
             </div>
           )}
 
-          <ul className="grid gap-2 sm:grid-cols-2">
+          <ul className="grid gap-2 pb-28 sm:grid-cols-2">
             {visible.map((s) => {
               const present = isPresent(s);
+              const note = reading[s.studentId];
               return (
-                <li key={s.studentId}>
+                <li key={s.studentId} id={`aluno-${s.studentId}`} className="scroll-mt-28">
                   <button
                     onClick={() => setPresence({ [s.studentId]: !present })}
                     className={cn(
                       "flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-2xl px-4 py-3 text-left ring-1 transition-all active:scale-[0.99]",
                       present ? "bg-emerald-50 ring-2 ring-emerald-500" : "bg-surface ring-zinc-200 hover:ring-zinc-300",
+                      spotId === s.studentId && "animate-face-spot",
                     )}
                   >
                     <Avatar name={s.name} tone={s.studentType === "Child" ? "sky" : "zinc"} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium text-zinc-900">{s.name}</p>
-                      <div className="mt-1 flex items-center gap-2">
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
                         <BeltBadge name={s.beltName} degree={s.degree} size="sm" />
                         <span className="text-xs text-zinc-500">{s.beltName}</span>
-                        {photoStatus[s.studentId]?.status === "suggested" && <span className="text-xs font-medium text-emerald-700">sugerido</span>}
-                        {photoStatus[s.studentId]?.status === "review" && <span className="text-xs font-medium text-amber-700">revisar</span>}
-                        {photoStatus[s.studentId]?.reason === "not_seen" && <span className="text-xs font-medium text-amber-700">pendente</span>}
-                        {photoStatus[s.studentId]?.reason === "no_profile" && <span className="text-xs font-medium text-zinc-500">sem cadastro facial</span>}
+                        {note === "recognized" && (
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
+                            <ScanFace className="size-3.5" /> reconhecido
+                          </span>
+                        )}
+                        {note === "review" && <span className="text-xs font-medium text-amber-700">confira</span>}
+                        {note === "missing" && <span className="text-xs font-medium text-zinc-700">não está na foto</span>}
+                        {note === "no_profile" && <span className="text-xs font-medium text-zinc-500">sem cadastro facial</span>}
                       </div>
                     </div>
                     <span

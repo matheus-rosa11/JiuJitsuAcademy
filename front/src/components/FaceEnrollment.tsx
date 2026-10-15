@@ -42,7 +42,7 @@ type Screen = "idle" | "running" | "error";
 
 function FaceGlyph({ tilt }: { tilt: number }) {
   return (
-    <svg viewBox="0 0 120 150" className="h-28 w-24 text-white/80" style={{ transform: `rotate(${tilt}deg)` }} aria-hidden>
+    <svg viewBox="0 0 120 150" className="h-28 w-24 text-white" style={{ transform: `rotate(${tilt}deg)` }} aria-hidden>
       <ellipse cx="60" cy="78" rx="34" ry="44" fill="none" stroke="currentColor" strokeWidth="3" />
       <circle cx="46" cy="70" r="3.5" fill="currentColor" />
       <circle cx="74" cy="70" r="3.5" fill="currentColor" />
@@ -333,7 +333,7 @@ export function FaceEnrollment({
 
   return (
     <div className="mx-auto w-full max-w-md">
-      <div className="palette-fixed overflow-hidden rounded-[2rem] bg-zinc-950 text-white shadow-xl">
+      <div className="face-stage overflow-hidden rounded-[2rem] shadow-xl">
         <div className="relative h-[28rem] bg-black">
           <video
             ref={videoRef}
@@ -345,10 +345,17 @@ export function FaceEnrollment({
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div
               className={cn(
-                "relative flex h-80 w-60 items-center justify-center rounded-[50%] shadow-[0_0_0_999px_rgba(0,0,0,0.62)] ring-4 transition-colors",
-                aligned ? "ring-emerald-400" : "ring-white/75",
+                "relative flex h-80 w-60 items-center justify-center rounded-[50%] border transition-all duration-700 ease-out",
+                aligned
+                  ? "border-emerald-200 shadow-[0_0_0_999px_rgba(0,0,0,0.5),0_0_56px_rgba(167,243,208,0.45)]"
+                  : "animate-face-breathe border-white/90 shadow-[0_0_0_999px_rgba(0,0,0,0.5)]",
               )}
             >
+              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[50%]">
+                {screen === "running" && (phase === "seek" || phase === "hold") ? (
+                  <div className="animate-face-scan absolute left-[14%] right-[14%] h-10 bg-gradient-to-b from-transparent via-white/70 to-transparent" />
+                ) : null}
+              </div>
               {(phase === "seek" && code === "no_face") || screen !== "running" ? <FaceGlyph tilt={tilt} /> : null}
               {phase === "perfect" || phase === "done" ? (
                 <div className="flex size-16 items-center justify-center rounded-full bg-emerald-500 text-white">
@@ -361,11 +368,11 @@ export function FaceEnrollment({
           </div>
         </div>
         <div className="px-6 pb-8 pt-5 text-center">
-          <p className="min-h-7 text-lg font-medium" aria-live="polite">
+          <p className="min-h-7 text-[17px] font-medium tracking-tight text-[#f4f4f5]" aria-live="polite">
             {screen === "error" ? error : instruction}
           </p>
-          <div className="mx-auto mt-4 h-1.5 w-40 overflow-hidden rounded-full bg-white/15">
-            <div className="h-full rounded-full bg-white transition-[width] duration-150" style={{ width: `${Math.min(100, progress * 100)}%` }} />
+          <div className="mx-auto mt-4 h-1 w-36 overflow-hidden rounded-full bg-white/20">
+            <div className="h-full rounded-full bg-white transition-[width] duration-500 ease-out" style={{ width: `${Math.min(100, progress * 100)}%` }} />
           </div>
           <div className="mt-5 flex justify-center gap-2">
             {POSES.map((pose, index) => (
@@ -383,17 +390,17 @@ export function FaceEnrollment({
             ))}
           </div>
           {screen === "idle" && (
-            <button type="button" className="mt-6 h-11 w-full cursor-pointer rounded-xl bg-white text-sm font-medium text-zinc-950" onClick={() => void startCamera()}>
+            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" onClick={() => void startCamera()}>
               Começar
             </button>
           )}
           {screen === "error" && (
-            <button type="button" className="mt-6 h-11 w-full cursor-pointer rounded-xl bg-white text-sm font-medium text-zinc-950" onClick={() => void startCamera()}>
+            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" onClick={() => void startCamera()}>
               Tentar de novo
             </button>
           )}
           {phase === "done" && (
-            <button type="button" className="mt-6 h-11 w-full cursor-pointer rounded-xl bg-white text-sm font-medium text-zinc-950" onClick={onContinue}>
+            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" onClick={onContinue}>
               {continueLabel}
             </button>
           )}
