@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, ScanFace, Upload } from "lucide-react";
+import { Camera, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { imageFileToDataUrl, photoRoll, type FaceReading } from "@/lib/classPhoto";
@@ -165,26 +165,19 @@ export function ClassPhotoRoll({
                     width: `${((x2 - x1) / natural.width) * 100}%`,
                     height: `${((y2 - y1) / natural.height) * 100}%`,
                   };
+                  const tone = !known || !linked ? "border-white" : needsReview ? "border-amber-400" : "border-emerald-400";
                   if (!known || !linked) {
-                    return (
-                      <span key={face.index} className="pointer-events-none absolute border-2 border-white" style={boxStyle}>
-                        <span className="absolute -top-2 left-1/2 flex size-5 -translate-x-1/2 items-center justify-center rounded-full bg-white text-xs font-semibold text-black">?</span>
-                      </span>
-                    );
+                    return <span key={face.index} className={`pointer-events-none absolute border-2 ${tone}`} style={boxStyle} />;
                   }
                   return (
                     <button
                       key={face.index}
                       type="button"
-                      className={`absolute border-2 ${needsReview ? "border-amber-300" : "border-emerald-300"}`}
+                      className={`absolute cursor-pointer border-2 bg-transparent ${tone}`}
                       style={boxStyle}
                       aria-label={`Ver ${names.get(linked) ?? "aluno"} na lista`}
                       onClick={() => onFocus(linked)}
-                    >
-                      <span className={`absolute -top-2 left-1/2 flex size-5 -translate-x-1/2 items-center justify-center rounded-full ${needsReview ? "bg-amber-300 text-black" : "bg-emerald-300 text-black"}`}>
-                        <ScanFace className="size-3.5" />
-                      </span>
-                    </button>
+                    />
                   );
                 })}
             </div>
@@ -195,7 +188,7 @@ export function ClassPhotoRoll({
             {" · "}
             {missing} não {missing === 1 ? "está" : "estão"} na foto
             {noProfile > 0 ? ` · ${noProfile} sem cadastro facial` : ""}
-            {roll.unknownFaces > 0 ? ` · ${roll.unknownFaces} ${roll.unknownFaces === 1 ? "rosto" : "rostos"} com ?` : ""}
+            {roll.unknownFaces > 0 ? ` · ${roll.unknownFaces} ${roll.unknownFaces === 1 ? "rosto sem nome" : "rostos sem nome"}` : ""}
             {seconds ? ` · ${seconds} s` : ""}
           </p>
           {result.faces.length === 0 && <p className="text-sm text-zinc-700">Não encontramos rostos nesta foto.</p>}
