@@ -6,6 +6,7 @@ The academy system should call these routes. It should not run its own face mode
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 
 import numpy as np
@@ -14,6 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
+from .attendance import assemble_roll
 from .decisions import rank_students
 from .engine import analyze, recognize_faces
 from .geometry import POSES
@@ -67,6 +69,11 @@ class EnrollIn(BaseModel):
 class RecognizeIn(BaseModel):
     imageBase64: str = Field(min_length=20)
     candidateStudentIds: list[str] | None = None
+
+
+class AttendanceIn(BaseModel):
+    imageBase64: str = Field(min_length=20)
+    candidateStudentIds: list[str]
 
 
 def _student_id(value: str) -> str:
@@ -170,21 +177,23 @@ def get_profile(student_id: str, embeddings: bool = Query(default=False)):
     return profile
 
 
-@app.post("/faces/recognize")
-def recognize(body: RecognizeIn):
-    try:
-        image = decode_image(body.imageBase64)
-    except ImageError as exc:
-        raise HTTPException(status_code=422, detail={"message": message_for(exc.code), "code": exc.code}) from exc
+def _candidate_ids(values: list[str] | None) -> list[str] | None:
+    if values is None:
+        return None
+    ordered: list[str] = []
+    for item in values:
+        student_id = _student_id(item)
+        if student_id not in ordered:
+            ordered.append(student_id)
+    return ordered
 
-    candidate_ids = body.candidateStudentIds
-    if candidate_ids is not None:
-        candidate_ids = [_student_id(item) for item in candidate_ids]
+
+def _match(image: np.ndarray, candidate_ids: list[str] | None) -> tuple[list[dict], set[str]]:
     rows = get_store().embeddings(candidate_ids)
     by_student: dict[str, list[tuple[str, np.ndarray]]] = {}
     for student_id, pose, vector in rows:
         by_student.setdefault(student_id, []).append((pose, vector))
-
+    enrolled = set(by_student)
     faces_out = []
     for assessment, box in recognize_faces(image):
         scores = []
@@ -206,4 +215,29 @@ def recognize(body: RecognizeIn):
                 "candidates": decision["candidates"],
             }
         )
+    return faces_out, enrolled
+
+
+@app.post("/faces/recognize")
+def recognize(body: RecognizeIn):
+    try:
+        image = decode_image(body.imageBase64)
+    except ImageError as exc:
+        raise HTTPException(status_code=422, detail={"message": message_for(exc.code), "code": exc.code}) from exc
+    faces_out, _enrolled = _match(image, _candidate_ids(body.candidateStudentIds))
     return {"faces": faces_out}
+
+
+@app.post("/faces/attendance")
+def attendance(body: AttendanceIn):
+    """Suggest presence for one class. Does not write attendance and does not imply absences."""
+    started = time.perf_counter()
+    try:
+        image = decode_image(body.imageBase64)
+    except ImageError as exc:
+        raise HTTPException(status_code=422, detail={"message": message_for(exc.code), "code": exc.code}) from exc
+    candidate_ids = _candidate_ids(body.candidateStudentIds) or []
+    faces_out, enrolled = _match(image, candidate_ids)
+    roll = assemble_roll(candidate_ids, faces_out, enrolled)
+    roll["elapsedMs"] = int((time.perf_counter() - started) * 1000)
+    return roll

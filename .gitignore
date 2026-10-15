@@ -29,3 +29,7 @@ face-service/data/
 # MediaPipe assets copied by front/scripts/prepare-face-assets.mjs
 front/public/mediapipe/
 front/public/models/
+
+# Class-photo evaluation stays local: photos, consent, and generated reports.
+eval/datasets/
+eval/reports/

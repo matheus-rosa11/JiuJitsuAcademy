@@ -142,6 +142,51 @@ def test_demo_samples_and_a_group_photo_keep_strangers_unknown(client, pose_imag
     assert all(face["studentId"] in (None, "aluno-frente") for face in faces)
 
 
+def test_attendance_suggests_the_roster_and_never_writes_an_absence(client, pose_images):
+    """Wiring check. The group photo is the source of the enrollment crops, so this is not a score."""
+    client.post(
+        "/faces/enroll",
+        json={
+            "studentId": "ana",
+            "captures": [
+                {"pose": pose, "imageBase64": jpeg_b64(pose_images[pose])} for pose in ("front", "left", "right")
+            ],
+        },
+    )
+    response = client.post(
+        "/faces/attendance",
+        json={
+            "imageBase64": jpeg_b64(pose_images["group"]),
+            "candidateStudentIds": ["ana", "bia"],
+        },
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["elapsedMs"] >= 0
+    by_id = {item["studentId"]: item for item in body["students"]}
+    assert set(by_id) == {"ana", "bia"}
+    assert by_id["ana"]["status"] in {"suggested", "review"}
+    assert by_id["bia"]["status"] == "pending"
+    assert by_id["bia"]["reason"] == "no_profile"
+    assert body["counts"]["unknownFaces"] >= 1
+    assert all(item["status"] in {"suggested", "review", "pending"} for item in body["students"])
+    assert all(face["studentId"] in (None, "ana") for face in body["faces"])
+    assert "absent" not in response.text
+
+
+def test_attendance_requires_the_class_roster(client, pose_images):
+    missing = client.post("/faces/attendance", json={"imageBase64": jpeg_b64(pose_images["front"])})
+    assert missing.status_code == 422
+    empty = client.post(
+        "/faces/attendance",
+        json={"imageBase64": jpeg_b64(pose_images["front"]), "candidateStudentIds": []},
+    )
+    assert empty.status_code == 200, empty.text
+    assert empty.json()["students"] == []
+    assert empty.json()["faces"]
+    assert all(face["role"] == "unknown" and face["studentId"] is None for face in empty.json()["faces"])
+
+
 def test_restricting_candidates_to_an_empty_class_matches_nobody(client, pose_images):
     client.post(
         "/faces/enroll",
