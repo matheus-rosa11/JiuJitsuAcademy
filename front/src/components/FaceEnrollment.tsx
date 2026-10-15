@@ -342,7 +342,7 @@ export function FaceEnrollment({
   return (
     <div className="mx-auto w-full max-w-md">
       <div className="face-stage overflow-hidden rounded-[2rem] shadow-xl">
-        <div className="relative h-[28rem] bg-black">
+        <div className="relative h-[28rem] overflow-hidden bg-black">
           <video
             ref={videoRef}
             playsInline
