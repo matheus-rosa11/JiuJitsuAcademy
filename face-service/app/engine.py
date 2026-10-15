@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import threading
 
 import numpy as np
@@ -18,7 +19,8 @@ def get_app():
     if _app is None:
         from insightface.app import FaceAnalysis
 
-        runtime = FaceAnalysis(name="buffalo_l", providers=["CPUExecutionProvider"])
+        root = os.environ.get("INSIGHTFACE_HOME", "~/.insightface")
+        runtime = FaceAnalysis(name="buffalo_l", root=root, providers=["CPUExecutionProvider"])
         runtime.prepare(ctx_id=-1, det_size=(640, 640))
         _app = runtime
     return _app
