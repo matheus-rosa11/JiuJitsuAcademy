@@ -3,7 +3,7 @@
 import { Camera, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button, Card } from "@/components/ui";
-import { imageFileToDataUrl, photoRoll, type FaceReading } from "@/lib/classPhoto";
+import { imageFileToDataUrl, matchedInstructors, nextInstructor, photoRoll, type FaceReading, type InstructorPerson } from "@/lib/classPhoto";
 import { demoSamples, FaceApiError, suggestAttendance, type AttendanceSuggestion } from "@/lib/faces";
 
 interface RosterStudent {
@@ -13,11 +13,13 @@ interface RosterStudent {
 
 export function ClassPhotoRoll({
   students,
+  professors,
   onRecognized,
   onFocus,
   onClear,
 }: {
   students: RosterStudent[];
+  professors: InstructorPerson[];
   onRecognized: (present: Record<string, true>, reading: Record<string, FaceReading>) => void;
   onFocus: (studentId: string) => void;
   onClear: () => void;
@@ -31,11 +33,13 @@ export function ClassPhotoRoll({
   const [preview, setPreview] = useState<string | null>(null);
   const [result, setResult] = useState<AttendanceSuggestion | null>(null);
   const [natural, setNatural] = useState<{ width: number; height: number } | null>(null);
+  const [instructorOverride, setInstructorOverride] = useState<string | null>(null);
 
   function clearPhoto() {
     setPreview(null);
     setResult(null);
     setNatural(null);
+    setInstructorOverride(null);
     setSample(false);
     setError(null);
     onClear();
@@ -45,10 +49,13 @@ export function ClassPhotoRoll({
     setBusy(true);
     setError(null);
     try {
+      const rosterIds = new Set(students.map((student) => student.studentId));
       const suggestion = await suggestAttendance(
         imageBase64,
-        students.map((student) => student.studentId),
+        [...rosterIds],
+        professors.filter((professor) => !rosterIds.has(professor.id)).map((professor) => professor.id),
       );
+      setInstructorOverride(null);
       const roll = photoRoll(suggestion.students, suggestion.faces);
       setPreview(imageBase64);
       setResult(suggestion);
@@ -89,6 +96,9 @@ export function ClassPhotoRoll({
   }
 
   const roll = result ? photoRoll(result.students, result.faces) : null;
+  const instructorChoices = result ? matchedInstructors(professors, result.faces) : [];
+  const instructor =
+    instructorChoices.find((professor) => professor.id === instructorOverride) ?? instructorChoices[0] ?? null;
   const seconds = result ? (result.elapsedMs / 1000).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : null;
   const recognized = roll ? Object.values(roll.reading).filter((value) => value === "recognized").length : 0;
   const review = roll ? Object.values(roll.reading).filter((value) => value === "review").length : 0;
@@ -165,6 +175,9 @@ export function ClassPhotoRoll({
                     width: `${((x2 - x1) / natural.width) * 100}%`,
                     height: `${((y2 - y1) / natural.height) * 100}%`,
                   };
+                  if (face.role === "instructor") {
+                    return <span key={face.index} className="pointer-events-none absolute border-2 border-sky-300" style={boxStyle} />;
+                  }
                   const tone = !known || !linked ? "border-white" : needsReview ? "border-amber-400" : "border-emerald-400";
                   if (!known || !linked) {
                     return <span key={face.index} className={`pointer-events-none absolute border-2 ${tone}`} style={boxStyle} />;
@@ -182,6 +195,23 @@ export function ClassPhotoRoll({
                 })}
             </div>
           </div>
+          {instructor && (
+            <p className="text-sm text-zinc-700">
+              Professor:{" "}
+              {instructorChoices.length > 1 ? (
+                <button
+                  type="button"
+                  className="cursor-pointer font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-2"
+                  onClick={() => setInstructorOverride(nextInstructor(instructorChoices.map((professor) => professor.id), instructor.id))}
+                >
+                  {instructor.name}
+                </button>
+              ) : (
+                <span className="font-medium text-zinc-900">{instructor.name}</span>
+              )}
+              {instructorChoices.length > 1 && <span className="text-zinc-500"> · toque para trocar</span>}
+            </p>
+          )}
           <p className="text-sm text-zinc-700">
             {recognized} {recognized === 1 ? "reconhecido" : "reconhecidos"}
             {review > 0 ? ` · ${review} ${review === 1 ? "incerto" : "incertos"}` : ""}

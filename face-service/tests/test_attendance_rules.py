@@ -62,3 +62,44 @@ def test_an_unsure_match_is_review_and_an_empty_roster_names_nobody():
     assert empty["students"] == []
     assert empty["faces"][0]["role"] == "unknown"
     assert empty["faces"][0]["studentId"] is None
+
+
+def test_an_off_roster_professor_is_named_without_joining_the_roll():
+    roll = assemble_roll(
+        ["ana"],
+        [
+            _face("MATCHED", "giba", box=[0, 0, 10, 10]),
+            _face("MATCHED", "ana", box=[20, 0, 30, 10]),
+            _face("UNKNOWN", None, score=0.1, box=[40, 0, 50, 10]),
+        ],
+        {"ana", "giba"},
+        ["giba"],
+    )
+    assert roll["faces"][0]["role"] == "instructor"
+    assert roll["faces"][0]["studentId"] == "giba"
+    assert roll["faces"][1]["role"] == "suggested"
+    assert [item["studentId"] for item in roll["students"]] == ["ana"]
+    assert roll["counts"]["unknownFaces"] == 1
+    assert roll["counts"]["suggested"] == 1
+
+
+def test_a_professor_who_is_on_the_roster_stays_a_student():
+    roll = assemble_roll(
+        ["felipe"],
+        [_face("MATCHED", "felipe")],
+        {"felipe"},
+        ["felipe"],
+    )
+    assert roll["faces"][0]["role"] == "suggested"
+    assert roll["students"][0]["status"] == "suggested"
+
+
+def test_an_unsure_professor_is_not_named():
+    face = _face("REVIEW", "giba", score=0.34, ambiguous=True)
+    face["candidates"] = [{"studentId": "giba", "decision": "REVIEW"}, {"studentId": "ana", "decision": "REVIEW"}]
+    roll = assemble_roll(["ana"], [face], {"giba", "ana"}, ["giba"])
+    assert roll["faces"][0]["role"] == "unknown"
+    assert roll["faces"][0]["studentId"] is None
+    assert roll["faces"][0]["candidates"][1]["studentId"] == "ana"
+    assert roll["counts"]["unknownFaces"] == 1
+    assert all(item["studentId"] != "giba" for item in roll["students"])

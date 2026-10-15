@@ -112,7 +112,7 @@ export function recognizeFaces(imageBase64: string, candidateStudentIds?: string
 export interface AttendanceFace {
   index: number;
   box: number[] | null;
-  role: "suggested" | "review" | "unknown";
+  role: "suggested" | "review" | "unknown" | "instructor";
   studentId: string | null;
   score: number | null;
   matchedPose: Pose | null;
@@ -135,9 +135,9 @@ export interface AttendanceSuggestion {
   elapsedMs: number;
 }
 
-export function suggestAttendance(imageBase64: string, candidateStudentIds: string[]) {
+export function suggestAttendance(imageBase64: string, candidateStudentIds: string[], instructorStudentIds: string[] = []) {
   return faceApi<AttendanceSuggestion>("/attendance", {
     method: "POST",
-    body: { imageBase64, candidateStudentIds },
+    body: { imageBase64, candidateStudentIds, instructorStudentIds },
   });
 }
