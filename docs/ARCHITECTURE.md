@@ -52,7 +52,8 @@ Aluno → este enrollment → Face Profile
 Treino → tela Presença da turma → Tirar foto
          → POST /faces/attendance
          com candidateStudentIds = alunos daquela lista
-         → suggested / review / unknown
+         e instructorStudentIds = quem pode dar aula e não está na lista
+         → suggested / review / unknown / instructor
          → aluno não visto fica pending, não ausente
          → professor corrige e confirma
          → presença na API .NET

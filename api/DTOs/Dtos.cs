@@ -19,7 +19,9 @@ public record StudentListItemDto(
     int CurrentDegree,
     decimal MonthlyFee,
     string? Phone,
-    string? Email);
+    string? Email,
+    bool IsProfessor,
+    bool IsPrincipalProfessor);
 
 public record StudentDetailDto(
     Guid Id,
@@ -41,7 +43,17 @@ public record StudentDetailDto(
     IReadOnlyList<StudentResponsibleDto> Responsibles,
     IReadOnlyList<GraduationDto> Graduations,
     IReadOnlyList<ClassSummaryDto> Classes,
-    IReadOnlyList<PaymentDto> RecentPayments);
+    IReadOnlyList<PaymentDto> RecentPayments,
+    bool IsProfessor,
+    bool IsPrincipalProfessor);
+
+public record ProfessorDto(
+    Guid Id,
+    string Name,
+    string BeltName,
+    int BeltOrder,
+    int Degree,
+    bool IsPrincipal);
 
 public record AttendanceSummaryDto(int TotalPresences, int PresencesLast30Days, int SessionsLast30Days, double RateLast30Days);
 
@@ -75,7 +87,9 @@ public record StudentRequest(
     decimal MonthlyFee,
     string? Notes,
     List<Guid>? ClassIds,
-    List<ResponsibleLinkDto>? Responsibles);
+    List<ResponsibleLinkDto>? Responsibles,
+    bool IsProfessor,
+    bool IsPrincipalProfessor);
 
 // Graduations
 

@@ -75,6 +75,11 @@ export default function StudentPage() {
               <h1 className="text-2xl font-semibold tracking-tight">{student.name}</h1>
               <Badge tone={student.studentType === "Child" ? "blue" : "zinc"}>{studentTypeLabel(student.studentType)}</Badge>
               {student.active ? <Badge tone="green">Ativo</Badge> : <Badge>Inativo</Badge>}
+              {student.isPrincipalProfessor ? (
+                <Badge tone="blue">Professor principal</Badge>
+              ) : (
+                student.isProfessor && <Badge tone="blue">Professor</Badge>
+              )}
             </div>
             <p className="mt-1 text-sm text-zinc-500">
               {student.age} anos · treina desde {formatDate(student.joinedAt)}

@@ -41,6 +41,9 @@ public class StudentsController(StudentService students, GraduationService gradu
         [FromQuery] Guid? beltId)
         => students.ListAsync(search, type, active, beltId);
 
+    [HttpGet("professors")]
+    public Task<List<ProfessorDto>> Professors() => students.ListProfessorsAsync();
+
     [HttpGet("{id:guid}")]
     public Task<StudentDetailDto> Get(Guid id) => students.GetAsync(id);
 

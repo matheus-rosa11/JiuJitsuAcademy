@@ -27,7 +27,20 @@ public class StudentService(AppDbContext db, PaymentService payments)
 
         return students.Select(s => new StudentListItemDto(
             s.Id, s.Name, s.StudentType, s.Active, s.AgeOn(today), s.CurrentBeltId, s.CurrentBelt.Name,
-            s.CurrentDegree, s.MonthlyFee, s.Phone, s.Email)).ToList();
+            s.CurrentDegree, s.MonthlyFee, s.Phone, s.Email, s.IsProfessor, s.IsPrincipalProfessor)).ToList();
+    }
+
+    public async Task<List<ProfessorDto>> ListProfessorsAsync()
+    {
+        var professors = await db.Students.AsNoTracking()
+            .Include(s => s.CurrentBelt)
+            .Where(s => s.Active && s.IsProfessor)
+            .OrderByDescending(s => s.IsPrincipalProfessor)
+            .ThenBy(s => s.Name)
+            .ToListAsync();
+
+        return professors.Select(s => new ProfessorDto(
+            s.Id, s.Name, s.CurrentBelt.Name, s.CurrentBelt.Order, s.CurrentDegree, s.IsPrincipalProfessor)).ToList();
     }
 
     public async Task<StudentDetailDto> GetAsync(Guid id)
@@ -95,7 +108,9 @@ public class StudentService(AppDbContext db, PaymentService payments)
                 .OrderByDescending(p => p.DueDate)
                 .Take(6)
                 .Select(p => new PaymentDto(p.Id, p.StudentId, student.Name, p.Amount, p.DueDate, p.PaidAt, p.Status, p.Notes))
-                .ToList());
+                .ToList(),
+            student.IsProfessor,
+            student.IsPrincipalProfessor);
     }
 
     public async Task<StudentDetailDto> CreateAsync(StudentRequest request)
@@ -106,6 +121,7 @@ public class StudentService(AppDbContext db, PaymentService payments)
         var student = new Student { Id = Guid.NewGuid(), CreatedAt = now };
         Apply(student, request);
         db.Students.Add(student);
+        await ClearOtherPrincipalsAsync(student);
 
         // Every student starts with a history entry so the timeline is never empty.
         db.Graduations.Add(new Graduation
@@ -152,6 +168,7 @@ public class StudentService(AppDbContext db, PaymentService payments)
         }
 
         Apply(student, request);
+        await ClearOtherPrincipalsAsync(student);
 
         await SyncClassesAsync(student, request.ClassIds);
         await SyncResponsiblesAsync(student, request.Responsibles);
@@ -197,7 +214,21 @@ public class StudentService(AppDbContext db, PaymentService payments)
         student.CurrentDegree = request.CurrentDegree;
         student.MonthlyFee = request.MonthlyFee;
         student.Notes = Clean(request.Notes);
+        student.IsPrincipalProfessor = request.IsPrincipalProfessor;
+        student.IsProfessor = request.IsProfessor || request.IsPrincipalProfessor;
+        if (!student.IsProfessor)
+            student.IsPrincipalProfessor = false;
         student.UpdatedAt = DateTime.UtcNow;
+    }
+
+    private async Task ClearOtherPrincipalsAsync(Student student)
+    {
+        if (!student.IsPrincipalProfessor)
+            return;
+
+        await db.Students
+            .Where(s => s.Id != student.Id && s.IsPrincipalProfessor)
+            .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsPrincipalProfessor, false));
     }
 
     private async Task SyncClassesAsync(Student student, List<Guid>? classIds)
