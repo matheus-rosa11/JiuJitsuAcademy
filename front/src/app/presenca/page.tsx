@@ -252,7 +252,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
                         : note === "review"
                           ? "bg-amber-50 ring-2 ring-amber-400"
                           : note === "missing"
-                            ? "bg-surface ring-2 ring-zinc-400"
+                            ? "bg-red-50 ring-2 ring-red-500"
                             : "bg-surface ring-1 ring-zinc-200 hover:ring-zinc-300",
                       spotId === s.studentId && "animate-face-spot",
                     )}
@@ -273,8 +273,8 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
                             incerto
                           </span>
                         )}
-                        {note === "missing" && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-semibold text-zinc-900">
+                        {note === "missing" && !present && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
                             <UserRoundX className="size-3.5" /> não está na foto
                           </span>
                         )}

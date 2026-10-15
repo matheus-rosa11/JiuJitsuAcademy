@@ -46,6 +46,7 @@
   --color-amber-800: oklch(87.9% 0.169 91.605);
 
   --color-red-50: color-mix(in oklab, oklch(63.7% 0.237 25.331) 12%, transparent);
+  --color-red-100: color-mix(in oklab, oklch(63.7% 0.237 25.331) 18%, transparent);
   --color-red-200: color-mix(in oklab, oklch(63.7% 0.237 25.331) 30%, transparent);
   --color-red-600: oklch(68% 0.2 23);
   --color-red-700: oklch(76% 0.15 20);
