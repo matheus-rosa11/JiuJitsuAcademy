@@ -92,7 +92,8 @@ export function ClassPhotoRoll({
   const seconds = result ? (result.elapsedMs / 1000).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : null;
   const recognized = roll ? Object.values(roll.reading).filter((value) => value === "recognized").length : 0;
   const review = roll ? Object.values(roll.reading).filter((value) => value === "review").length : 0;
-  const missing = roll ? Object.values(roll.reading).filter((value) => value === "missing" || value === "no_profile").length : 0;
+  const missing = roll ? Object.values(roll.reading).filter((value) => value === "missing").length : 0;
+  const noProfile = roll ? Object.values(roll.reading).filter((value) => value === "no_profile").length : 0;
 
   return (
     <Card className="space-y-4 p-4 sm:p-5">
@@ -188,8 +189,12 @@ export function ClassPhotoRoll({
                 })}
             </div>
           </div>
-          <p className="text-sm text-zinc-600">
-            {recognized} {recognized === 1 ? "reconhecido" : "reconhecidos"} · {review} para conferir · {missing} não {missing === 1 ? "está" : "estão"} na foto
+          <p className="text-sm text-zinc-700">
+            {recognized} {recognized === 1 ? "reconhecido" : "reconhecidos"}
+            {review > 0 ? ` · ${review} ${review === 1 ? "incerto" : "incertos"}` : ""}
+            {" · "}
+            {missing} não {missing === 1 ? "está" : "estão"} na foto
+            {noProfile > 0 ? ` · ${noProfile} sem cadastro facial` : ""}
             {roll.unknownFaces > 0 ? ` · ${roll.unknownFaces} ${roll.unknownFaces === 1 ? "rosto" : "rostos"} com ?` : ""}
             {seconds ? ` · ${seconds} s` : ""}
           </p>

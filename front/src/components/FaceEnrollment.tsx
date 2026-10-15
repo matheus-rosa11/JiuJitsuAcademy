@@ -19,6 +19,14 @@ import { checkFace, enrollFace, getFaceProfile, type FaceProfile, type FaceQuali
 import { loadFaceGuide, readingFromResult } from "@/lib/faceVision";
 import { cn } from "./ui";
 
+const startButtonStyle = {
+  WebkitAppearance: "none" as const,
+  appearance: "none" as const,
+  backgroundColor: "#ffffff",
+  color: "#141414",
+  border: 0,
+};
+
 export interface EnrollmentShot {
   pose: Pose;
   imageBase64: string;
@@ -347,13 +355,13 @@ export function FaceEnrollment({
               className={cn(
                 "relative flex h-80 w-60 items-center justify-center rounded-[50%] border transition-all duration-700 ease-out",
                 aligned
-                  ? "border-emerald-200 shadow-[0_0_0_999px_rgba(0,0,0,0.5),0_0_56px_rgba(167,243,208,0.45)]"
-                  : "animate-face-breathe border-white/90 shadow-[0_0_0_999px_rgba(0,0,0,0.5)]",
+                  ? "border-emerald-200/90 shadow-[0_0_0_999px_rgba(0,0,0,0.55),0_0_48px_rgba(167,243,208,0.35)]"
+                  : "animate-face-breathe border-white/75 shadow-[0_0_0_999px_rgba(0,0,0,0.55)]",
               )}
             >
               <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[50%]">
                 {screen === "running" && (phase === "seek" || phase === "hold") ? (
-                  <div className="animate-face-scan absolute left-[14%] right-[14%] h-10 bg-gradient-to-b from-transparent via-white/70 to-transparent" />
+                  <div className="animate-face-scan absolute left-[18%] right-[18%] top-1/2 h-16 -translate-y-1/2 bg-gradient-to-b from-transparent via-white/45 to-transparent blur-[1px]" />
                 ) : null}
               </div>
               {(phase === "seek" && code === "no_face") || screen !== "running" ? <FaceGlyph tilt={tilt} /> : null}
@@ -368,7 +376,7 @@ export function FaceEnrollment({
           </div>
         </div>
         <div className="px-6 pb-8 pt-5 text-center">
-          <p className="min-h-7 text-[17px] font-medium tracking-tight text-[#f4f4f5]" aria-live="polite">
+          <p className="min-h-7 text-[17px] font-medium tracking-tight" style={{ color: "#f4f4f5" }} aria-live="polite">
             {screen === "error" ? error : instruction}
           </p>
           <div className="mx-auto mt-4 h-1 w-36 overflow-hidden rounded-full bg-white/20">
@@ -390,17 +398,17 @@ export function FaceEnrollment({
             ))}
           </div>
           {screen === "idle" && (
-            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" onClick={() => void startCamera()}>
+            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" style={startButtonStyle} onClick={() => void startCamera()}>
               Começar
             </button>
           )}
           {screen === "error" && (
-            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" onClick={() => void startCamera()}>
+            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" style={startButtonStyle} onClick={() => void startCamera()}>
               Tentar de novo
             </button>
           )}
           {phase === "done" && (
-            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" onClick={onContinue}>
+            <button type="button" className="face-start mt-7 h-12 w-full cursor-pointer rounded-full text-[15px] font-semibold" style={startButtonStyle} onClick={onContinue}>
               {continueLabel}
             </button>
           )}

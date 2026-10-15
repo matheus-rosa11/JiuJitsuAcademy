@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, CheckCheck, ChevronLeft, ChevronRight, CircleCheck, Info, RotateCcw, ScanFace, Search, Users } from "lucide-react";
+import { CalendarCheck, CheckCheck, ChevronLeft, ChevronRight, CircleCheck, Info, RotateCcw, ScanFace, Search, UserRoundX, Users } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -194,12 +194,18 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
               setReading(nextReading);
               setPhotoActive(true);
               const count = Object.keys(present).length;
-              const missed = Object.values(nextReading).filter((value) => value === "missing" || value === "no_profile").length;
-              toast(
+              const missed = Object.values(nextReading).filter((value) => value === "missing").length;
+              const unenrolled = Object.values(nextReading).filter((value) => value === "no_profile").length;
+              const uncertain = Object.values(nextReading).filter((value) => value === "review").length;
+              const parts = [
                 count === 0
-                  ? "Ninguém foi reconhecido com certeza. A lista segue sem presença marcada pela foto."
-                  : `${count} ${count === 1 ? "presença marcada" : "presenças marcadas"} pela foto. ${missed} não estão na foto.`,
-              );
+                  ? "Ninguém foi reconhecido com certeza."
+                  : `${count} ${count === 1 ? "presença marcada" : "presenças marcadas"} pela foto.`,
+                `${missed} não ${missed === 1 ? "está" : "estão"} na foto.`,
+              ];
+              if (uncertain > 0) parts.push(`${uncertain} ${uncertain === 1 ? "incerto" : "incertos"}.`);
+              if (unenrolled > 0) parts.push(`${unenrolled} sem cadastro facial.`);
+              toast(parts.join(" "));
             }}
             onFocus={focusStudent}
             onClear={resetPhoto}
@@ -240,8 +246,14 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
                   <button
                     onClick={() => setPresence({ [s.studentId]: !present })}
                     className={cn(
-                      "flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-2xl px-4 py-3 text-left ring-1 transition-all active:scale-[0.99]",
-                      present ? "bg-emerald-50 ring-2 ring-emerald-500" : "bg-surface ring-zinc-200 hover:ring-zinc-300",
+                      "flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-2xl px-4 py-3 text-left transition-all active:scale-[0.99]",
+                      present
+                        ? "bg-emerald-50 ring-2 ring-emerald-500"
+                        : note === "review"
+                          ? "bg-amber-50 ring-2 ring-amber-400"
+                          : note === "missing"
+                            ? "bg-surface ring-2 ring-zinc-400"
+                            : "bg-surface ring-1 ring-zinc-200 hover:ring-zinc-300",
                       spotId === s.studentId && "animate-face-spot",
                     )}
                   >
@@ -252,12 +264,20 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
                         <BeltBadge name={s.beltName} degree={s.degree} size="sm" />
                         <span className="text-xs text-zinc-500">{s.beltName}</span>
                         {note === "recognized" && (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                             <ScanFace className="size-3.5" /> reconhecido
                           </span>
                         )}
-                        {note === "review" && <span className="text-xs font-medium text-amber-700">confira</span>}
-                        {note === "missing" && <span className="text-xs font-medium text-zinc-700">não está na foto</span>}
+                        {note === "review" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                            incerto
+                          </span>
+                        )}
+                        {note === "missing" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-semibold text-zinc-900">
+                            <UserRoundX className="size-3.5" /> não está na foto
+                          </span>
+                        )}
                         {note === "no_profile" && <span className="text-xs font-medium text-zinc-500">sem cadastro facial</span>}
                       </div>
                     </div>
