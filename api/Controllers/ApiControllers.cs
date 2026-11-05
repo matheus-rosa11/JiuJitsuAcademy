@@ -2,6 +2,7 @@ using JiuJitsu.Api.Data;
 using JiuJitsu.Api.DTOs;
 using JiuJitsu.Api.Models;
 using JiuJitsu.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ namespace JiuJitsu.Api.Controllers;
 public class BeltsController(AppDbContext db) : ControllerBase
 {
     /// <summary>Use ?studentType=Adult|Child so forms only ever list compatible belts.</summary>
+    [AllowAnonymous]
     [HttpGet]
     public async Task<List<BeltDto>> List([FromQuery] StudentType? studentType)
     {
@@ -31,8 +33,9 @@ public class BeltsController(AppDbContext db) : ControllerBase
 
 [ApiController]
 [Route("api/students")]
-public class StudentsController(StudentService students, GraduationService graduations) : ControllerBase
+public class StudentsController(StudentService students, GraduationService graduations, AuthService auth) : ControllerBase
 {
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public Task<List<StudentListItemDto>> List(
         [FromQuery] string? search,
@@ -41,12 +44,18 @@ public class StudentsController(StudentService students, GraduationService gradu
         [FromQuery] Guid? beltId)
         => students.ListAsync(search, type, active, beltId);
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("professors")]
     public Task<List<ProfessorDto>> Professors() => students.ListProfessorsAsync();
 
     [HttpGet("{id:guid}")]
-    public Task<StudentDetailDto> Get(Guid id) => students.GetAsync(id);
+    public Task<StudentDetailDto> Get(Guid id)
+    {
+        auth.RejectOtherStudent(Actor.From(User), id);
+        return students.GetAsync(id);
+    }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<StudentDetailDto>> Create(StudentRequest request)
     {
@@ -55,8 +64,30 @@ public class StudentsController(StudentService students, GraduationService gradu
     }
 
     [HttpPut("{id:guid}")]
-    public Task<StudentDetailDto> Update(Guid id, StudentRequest request) => students.UpdateAsync(id, request);
+    public async Task<StudentDetailDto> Update(Guid id, StudentRequest request)
+    {
+        var actor = Actor.From(User);
+        auth.RejectOtherStudent(actor, id);
+        if (!actor.IsAdmin)
+        {
+            var current = await students.GetAsync(id);
+            request = request with
+            {
+                MonthlyFee = current.MonthlyFee,
+                IsProfessor = current.IsProfessor,
+                IsPrincipalProfessor = current.IsPrincipalProfessor,
+                Active = current.Active,
+                StudentType = current.StudentType
+            };
+        }
 
+        await auth.EnsureEmailAvailableAsync(request.Email, id);
+        var updated = await students.UpdateAsync(id, request);
+        await auth.SyncLoginEmailAsync(id, updated.Email);
+        return updated;
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Deactivate(Guid id)
     {
@@ -65,13 +96,19 @@ public class StudentsController(StudentService students, GraduationService gradu
     }
 
     [HttpGet("{id:guid}/graduations")]
-    public Task<List<GraduationDto>> Graduations(Guid id) => graduations.ListByStudentAsync(id);
+    public Task<List<GraduationDto>> Graduations(Guid id)
+    {
+        auth.RejectOtherStudent(Actor.From(User), id);
+        return graduations.ListByStudentAsync(id);
+    }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("{id:guid}/graduations")]
     public Task<GraduationDto> AddGraduation(Guid id, GraduationRequest request) => graduations.CreateAsync(id, request);
 }
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/graduations")]
 public class GraduationsController(GraduationService graduations) : ControllerBase
 {
@@ -80,6 +117,7 @@ public class GraduationsController(GraduationService graduations) : ControllerBa
 }
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/responsibles")]
 public class ResponsiblesController(ResponsibleService responsibles) : ControllerBase
 {
@@ -97,17 +135,21 @@ public class ResponsiblesController(ResponsibleService responsibles) : Controlle
 [Route("api/classes")]
 public class ClassesController(ClassService classes) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpGet]
     public Task<List<ClassDto>> List() => classes.ListAsync();
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public Task<ClassDto> Create(ClassRequest request) => classes.CreateAsync(request);
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:guid}")]
     public Task<ClassDto> Update(Guid id, ClassRequest request) => classes.UpdateAsync(id, request);
 }
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/attendance")]
 public class AttendanceController(AttendanceService attendance) : ControllerBase
 {
@@ -124,6 +166,7 @@ public class AttendanceController(AttendanceService attendance) : ControllerBase
 }
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/payments")]
 public class PaymentsController(PaymentService payments) : ControllerBase
 {
@@ -159,6 +202,7 @@ public class PaymentsController(PaymentService payments) : ControllerBase
 }
 
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/dashboard")]
 public class DashboardController(DashboardService dashboard) : ControllerBase
 {

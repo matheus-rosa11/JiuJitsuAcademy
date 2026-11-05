@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import { Geist } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
+import { SessionProvider } from "@/components/Session";
 import { ToastProvider } from "@/components/Toast";
 import { themeScript } from "@/lib/theme";
 import "./globals.css";
@@ -19,7 +21,7 @@ export const viewport: Viewport = {
   themeColor: "#09090b",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" data-theme="light" className={`${geist.variable} antialiased`} suppressHydrationWarning>
       <head>
@@ -27,7 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <ToastProvider>
-          <AppShell>{children}</AppShell>
+          <SessionProvider>
+            <AppShell>{children}</AppShell>
+          </SessionProvider>
         </ToastProvider>
       </body>
     </html>

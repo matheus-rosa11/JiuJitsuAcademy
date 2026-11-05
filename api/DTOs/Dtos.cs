@@ -47,6 +47,21 @@ public record StudentDetailDto(
     bool IsProfessor,
     bool IsPrincipalProfessor);
 
+public record AuthResponse(string Token, Guid UserId, string Email, string Role, Guid? StudentId, string Name);
+
+public record LoginRequest(string Email, string Password);
+
+public record RegisterRequest(
+    string Name,
+    string Email,
+    string Password,
+    DateOnly BirthDate,
+    string? Phone,
+    Guid CurrentBeltId,
+    int CurrentDegree,
+    string? Notes,
+    List<Guid>? ClassIds);
+
 public record ProfessorDto(
     Guid Id,
     string Name,

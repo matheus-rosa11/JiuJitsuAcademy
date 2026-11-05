@@ -5,3 +5,6 @@ public class DomainException(string message) : Exception(message);
 
 /// <summary>Returned to the client as 404 with the message.</summary>
 public class NotFoundException(string message) : Exception(message);
+
+/// <summary>Returned to the client as 403 with the message.</summary>
+public class ForbiddenException(string message) : Exception(message);
