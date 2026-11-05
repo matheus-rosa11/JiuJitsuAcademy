@@ -2,7 +2,7 @@
 
 **Studio Mega — reconhecimento facial na chamada da aula**
 
-Versão da minuta: 1.1  
+Versão da minuta: 1.2  
 Data: 5 de novembro de 2026  
 Controladora (nome fantasia): Studio Mega
 
@@ -14,19 +14,17 @@ Esta minuta descreve o tratamento que o sistema da academia realmente faz hoje: 
 
 Isto é uma minuta feita para o fluxo do Studio Mega. Não é parecer jurídico e não é garantia de que não haverá processo. Biometria é dado pessoal sensível. Biometria de criança e de adolescente é tratamento de alto risco. Um termo bom reduz o risco quando a academia cumpre o que está escrito. Um termo que promete o que o sistema não faz aumenta o risco.
 
-Antes de colher a primeira assinatura, um advogado com inscrição na OAB, de preferência com prática em LGPD e em direitos de criança, deve revisar esta minuta com os dados reais da empresa. Os campos entre colchetes são obrigatórios. Sem eles o documento não identifica quem trata o dado.
+Antes de colher a primeira assinatura, um advogado com inscrição na OAB, de preferência com prática em LGPD e em direitos de criança, deve revisar esta minuta. Os dados da empresa abaixo foram informados pelo Studio Mega.
 
-Preencher:
-
-| Campo | O que colocar |
+| Campo | Valor |
 | --- | --- |
-| [RAZÃO SOCIAL] | Nome empresarial do contrato social, não só “Studio Mega” |
-| [CNPJ] | CNPJ da pessoa jurídica que é a dona do sistema e da academia |
-| [ENDEREÇO] | Endereço completo da sede e, se for diferente, o do tatame |
-| [E-MAIL DE PRIVACIDADE] | Caixa que uma pessoa real lê. É para onde o aluno ou o responsável escreve “apague o código do rosto” |
-| [TELEFONE] | Telefone do mesmo atendimento |
-| [NOME DO ENCARREGADO] | Quem recebe esse pedido e apaga o perfil no sistema. Pode ser o próprio dono. Não é um cargo público nem um pedido judicial |
-| [CIDADE DA ASSINATURA] | Cidade onde o termo é assinado |
+| Razão social | Studio Mega Treinamento LTDA |
+| CNPJ | 24.723.732/0001-78 |
+| Endereço | Av. Raimundo Pereira de Magalhães, 12600, Sobreloja, CEP 02989-095, São Paulo/SP |
+| Encarregado | Gilberto da Silva Júnior |
+| E-mail | professor.gilbertojr@gmail.com |
+| Telefone | (11) 97324-2972 |
+| Cidade da assinatura | São Paulo |
 
 O que esta minuta não substitui:
 
@@ -40,7 +38,7 @@ O que esta minuta não substitui:
 
 Esta parte é o consentimento específico e em destaque exigido para dado sensível e para dado de criança e de adolescente. Ela deve ser lida antes das cláusulas longas. Na folha de assinatura, a pessoa rubrica esta parte. Caixa já marcada não vale como consentimento.
 
-O Studio Mega, nome fantasia de [RAZÃO SOCIAL], CNPJ [CNPJ], pede autorização para usar o rosto do aluno, ou do professor, com uma única finalidade interna: saber quem está na aula.
+A Studio Mega Treinamento LTDA, nome fantasia Studio Mega, CNPJ 24.723.732/0001-78, pede autorização para usar o rosto do aluno, ou de quem dá aula, com uma única finalidade interna: saber quem está na aula.
 
 O que acontece na prática:
 
@@ -60,7 +58,7 @@ Dá para treinar sem isso. Se a pessoa não autorizar, ou se revogar depois, a c
 
 Criança e adolescente (menos de 18 anos) só entram nesse fluxo com a autorização de quem é pai, mãe ou responsável legal, além da explicação simples para o próprio menor. Recusar não impede a criança de treinar.
 
-A autorização vale até o desligamento, ou até a pessoa (ou o responsável) pedir para apagar o rosto. Apagar o rosto é um pedido feito à recepção ou ao e-mail [E-MAIL DE PRIVACIDADE]. Não é processo, não é ordem judicial e não cancela a matrícula. O código do rosto sai do sistema em até 15 dias. A lista de presença já lançada, sem foto, pode continuar guardada por 5 anos depois da saída, só com nome, turma, data e presente ou ausente.
+A autorização vale até o desligamento, ou até a pessoa (ou o responsável) pedir para apagar o rosto. Na própria ficha, o botão Remover apaga o código na hora. Quem preferir pedir para a recepção, em vez de usar a tela, escreve para professor.gilbertojr@gmail.com ou fala no balcão. Não é processo e não cancela a matrícula. Nesse caso o código sai em até 15 dias. A lista de presença já lançada, sem foto, pode continuar guardada por 5 anos depois da saída, só com nome, turma, data e presente ou ausente.
 
 O texto completo está nas Partes B a F. Este papel não autoriza publicar foto em lugar nenhum.
 
@@ -70,9 +68,9 @@ O texto completo está nas Partes B a F. Este papel não autoriza publicar foto 
 
 ### 1. Quem trata
 
-1.1. A controladora dos dados é [RAZÃO SOCIAL], nome fantasia Studio Mega, CNPJ [CNPJ], com sede em [ENDEREÇO], e-mail [E-MAIL DE PRIVACIDADE], telefone [TELEFONE].
+1.1. A controladora dos dados é Studio Mega Treinamento LTDA, nome fantasia Studio Mega, CNPJ 24.723.732/0001-78, com sede na Av. Raimundo Pereira de Magalhães, 12600, Sobreloja, CEP 02989-095, São Paulo/SP, e-mail professor.gilbertojr@gmail.com, telefone (11) 97324-2972.
 
-1.2. O encarregado pelo tratamento de dados pessoais é [NOME DO ENCARREGADO], no mesmo e-mail e telefone. É a essa pessoa que o titular, o responsável e a ANPD se dirigem.
+1.2. O encarregado pelo tratamento de dados pessoais é Gilberto da Silva Júnior, no mesmo e-mail e telefone. É a essa pessoa que o titular, o responsável e a ANPD se dirigem. Ele também é o professor principal da academia.
 
 1.3. “Aluno” inclui adulto e criança ou adolescente matriculado. “Professor” inclui quem dá aula e tem o rosto cadastrado para ser reconhecido na foto, esteja ou não na lista de presença da turma. O mesmo termo vale para os dois, porque o rosto segue o mesmo caminho.
 
@@ -154,11 +152,13 @@ O texto completo está nas Partes B a F. Este papel não autoriza publicar foto 
 
 ### 7. Quem enxerga
 
-7.1. Enxergam o cadastro e a tela da chamada as pessoas do Studio Mega que operam matrícula, secretaria ou a aula daquela turma, apenas para essas funções.
+7.1. Há dois logins. O login de administrador abre o painel completo, a chamada e a foto da turma. Esse login é usado por quem está nos cargos de administrador, professor responsável e recepção. No celular e no notebook da recepção, a sessão fica nesse login. O login de aluno abre somente a ficha, o histórico e o rosto da própria pessoa. Um aluno não vê e não altera o cadastro de outro.
 
-7.2. O operador de hospedagem pode enxergar o arquivo técnico do sistema na medida do serviço contratado, sob dever de confidencialidade. Não pode usar o conteúdo.
+7.2. Quem pode dar aula é uma marca no cadastro, ligada por administrador. O próprio aluno não liga nem desliga essa marca. Na foto do fim do treino, quem está no login de administrador escolhe o professor daquela aula numa lista só de quem tem a marca. O padrão é Gilberto da Silva Júnior, professor principal. Um aluno faixa roxa que der aula continua com login de aluno. Ele entra nessa lista se o administrador tiver marcado o cadastro dele. Essa escolha não publica imagem e não coloca a pessoa na lista de presença se ela não estiver matriculada na turma.
 
-7.3. Não há compartilhamento com outra academia, confederação, patrocinador, seguradora ou rede social por força deste termo. Ordem de autoridade pública será cumprida na forma da lei, limitada ao que for exigido, e o titular ou o responsável será informado quando a lei não proibir.
+7.3. O operador de hospedagem pode enxergar o arquivo técnico do sistema na medida do serviço contratado, sob dever de confidencialidade. Não pode usar o conteúdo.
+
+7.4. Não há compartilhamento com outra academia, confederação, patrocinador, seguradora ou rede social por força deste termo. Ordem de autoridade pública será cumprida na forma da lei, limitada ao que for exigido, e o titular ou o responsável será informado quando a lei não proibir.
 
 ### 8. Quanto tempo fica
 
@@ -171,7 +171,7 @@ O texto completo está nas Partes B a F. Este papel não autoriza publicar foto 
 - pedido da pessoa, ou do responsável, para apagar o código do rosto, mesmo que ela continue treinando;
 - constatação de que o cadastro foi feito sem a autorização exigida nesta minuta.
 
-8.3. O apagamento do código ocorre em até 15 dias corridos do fato. A confirmação é enviada a quem pediu, no contato informado, salvo se a pessoa dispensar.
+8.3. Se a própria pessoa apagar o código na ficha, a exclusão é imediata. Se o pedido for feito à recepção ou por e-mail, o apagamento ocorre em até 15 dias corridos. A confirmação é enviada a quem pediu, no contato informado, salvo se a pessoa dispensar.
 
 8.4. A lista de presença já salva, sem foto e sem código de rosto, fica guardada por 5 anos depois do desligamento. O que resta nesse prazo é nome, turma, data e se a pessoa estava presente ou ausente, para histórico da relação e para uma discussão futura (mensalidade, frequência, acidente). Findo o prazo, esse registro é eliminado ou anonimizado, salvo obrigação legal específica que mande guardar por mais tempo. Essa conservação não mantém o rosto.
 
@@ -197,7 +197,7 @@ O texto completo está nas Partes B a F. Este papel não autoriza publicar foto 
 
 ### 11. Direitos de quem é titular
 
-11.1. A pessoa, ou o responsável no caso de menor, pode pedir, pelo e-mail [E-MAIL DE PRIVACIDADE] ou na recepção:
+11.1. A pessoa, ou o responsável no caso de menor, pode pedir pelo e-mail professor.gilbertojr@gmail.com, pelo botão Remover na própria ficha, ou na recepção:
 
 - confirmação de que existe perfil de rosto;
 - acesso aos dados cadastrais e à informação de que o perfil existe, com a data da última gravação;
@@ -221,13 +221,13 @@ O texto completo está nas Partes B a F. Este papel não autoriza publicar foto 
 
 12.3. Refazer as três vistas, porque a luz ficou ruim ou a pessoa mudou, usa a mesma autorização, desde que a finalidade não mude. Mudou a finalidade, muda o termo.
 
-12.4. Esta versão é a 1.1, de 5 de novembro de 2026. Versão nova não aproveita silêncio de quem já assinou: ou a mudança é só de forma, e a academia informa, ou a mudança é de finalidade, de país do servidor ou de tipo de dado, e há pedido novo de consentimento.
+12.4. Esta versão é a 1.2, de 5 de novembro de 2026. Versão nova não aproveita silêncio de quem já assinou: ou a mudança é só de forma, e a academia informa, ou a mudança é de finalidade, de país do servidor ou de tipo de dado, e há pedido novo de consentimento.
 
 ### 13. Canal e foro
 
-13.1. Dúvida, pedido e reclamação de privacidade: [E-MAIL DE PRIVACIDADE] e [TELEFONE], aos cuidados de [NOME DO ENCARREGADO]. Também cabe reclamação à Autoridade Nacional de Proteção de Dados.
+13.1. Dúvida, pedido e reclamação de privacidade: professor.gilbertojr@gmail.com e (11) 97324-2972, aos cuidados de Gilberto da Silva Júnior. Também cabe reclamação à Autoridade Nacional de Proteção de Dados.
 
-13.2. Fica eleito o foro da comarca de [CIDADE DA ASSINATURA], sem retirar o foro de domicílio do consumidor quando a lei o garantir.
+13.2. Fica eleito o foro da comarca de São Paulo, sem retirar o foro de domicílio do consumidor quando a lei o garantir.
 
 ---
 
@@ -251,11 +251,11 @@ Li a Parte A em destaque e a Parte B. Sei que o rosto vira um código interno de
 
 As duas primeiras caixas precisam estar marcadas para o rosto ser cadastrado. Marcar só uma delas não basta.
 
-Local e data: [CIDADE DA ASSINATURA], ______ / ______ / __________
+Local e data: São Paulo, ______ / ______ / __________
 
 Assinatura: _______________________________________________
 
-Via da academia. A outra via fica com a pessoa. Versão da minuta: 1.1.
+Via da academia. A outra via fica com a pessoa. Versão da minuta: 1.2.
 
 ---
 
@@ -288,13 +288,13 @@ Ciência do menor, quando ele já consegue compreender (obrigatória a partir do
 [ ] O menor foi informado e não se opôs.  
 [ ] O menor se opôs. Não capturar o rosto.
 
-Local e data: [CIDADE DA ASSINATURA], ______ / ______ / __________
+Local e data: São Paulo, ______ / ______ / __________
 
 Assinatura do responsável: _______________________________________________
 
 Segunda assinatura, quando houver dois genitores: _______________________________________________
 
-Versão da minuta: 1.1. Uma via fica com a família.
+Versão da minuta: 1.2. Uma via fica com a família.
 
 ---
 
@@ -308,7 +308,7 @@ Este termo é só o reconhecimento facial da chamada. A assinatura não autoriza
 
 “Apagar o rosto” é o aluno, o professor ou o responsável pedindo para o Studio Mega eliminar o código do rosto. Faz na recepção ou por e-mail. A aula pode continuar, com chamada manual. Não é ação judicial.
 
-À [RAZÃO SOCIAL] (Studio Mega), [E-MAIL DE PRIVACIDADE].
+À Studio Mega Treinamento LTDA (Studio Mega), professor.gilbertojr@gmail.com.
 
 Eu, _______________________________________________, CPF _______________, peço:
 
@@ -337,13 +337,14 @@ Isto não é entregue para assinatura. É o que a academia precisa fazer para o 
 3. Não condicionar a matrícula, a mensalidade ou a graduação ao rosto.
 4. Não salvar a foto da turma no celular, no WhatsApp ou na galeria. Se o sistema operacional guardar a imagem, apagar em seguida.
 5. Não usar este termo como autorização de publicação. Foto para rede social fica fora deste papel.
-6. Quem sai, pede para apagar o rosto ou revoga: apagar o perfil facial no sistema em até 15 dias e anotar na Parte F. Quem recebe esse pedido é [NOME DO ENCARREGADO].
+6. Quem sai, pede para apagar o rosto ou revoga: apagar o perfil facial no sistema em até 15 dias e anotar na Parte F. Quem recebe o pedido feito à recepção é Gilberto da Silva Júnior. Se a própria pessoa apagar na ficha, o código sai na hora.
 7. Não restaurar de backup o perfil de quem pediu para apagar.
 8. Não cadastrar rosto se a caixa da Virgínia estiver em branco. As duas caixas de autorização da Parte C ou da Parte D precisam estar marcadas.
 9. Acesso à tela de chamada só de quem dá a aula ou da secretaria. Sair da conta ao terminar.
-10. Incidente (vazamento de cadastro, celular com fotos da turma, perfil exposto): avisar [NOME DO ENCARREGADO] no mesmo dia, para avaliar comunicação à ANPD e aos titulares.
-11. Guardar esta minuta versão 1.1 junto de cada aceite, para saber qual texto a pessoa viu.
-12. Uma vez por ano, revisar se o sistema ainda faz só o que a cláusula 3 descreve. Se passar a guardar foto, a ligar câmera o tempo todo ou a publicar imagem, parar e fazer termo novo.
+10. Incidente (vazamento de cadastro, celular com fotos da turma, perfil exposto): avisar Gilberto da Silva Júnior no mesmo dia, para avaliar comunicação à ANPD e aos titulares.
+11. Guardar esta minuta versão 1.2 junto de cada aceite, para saber qual texto a pessoa viu.
+12. A marca de quem pode dar aula só é alterada no login de administrador. O aluno não altera a própria marca. Na foto da turma, o padrão é Gilberto da Silva Júnior. A troca, se houver, é feita por quem está no login de administrador, entre as pessoas já marcadas.
+13. Uma vez por ano, revisar se o sistema ainda faz só o que a cláusula 3 descreve. Se passar a guardar foto, a ligar câmera o tempo todo ou a publicar imagem, parar e fazer termo novo.
 
 Descrição técnica que esta rotina considera verdadeira, e que deixa de valer se o software mudar:
 
@@ -357,15 +358,12 @@ Descrição técnica que esta rotina considera verdadeira, e que deixa de valer 
 
 ---
 
-## Parte H — O que ainda falta o dono passar
+## Parte H — Dados já preenchidos
 
-Já entraram nesta versão 1.1: hospedagem na Railway em US East (Virgínia, Estados Unidos); ausência de câmera fixa no tatame; este papel não trata de rede social; lista de presença sem foto guardada por 5 anos depois da saída; código do rosto apagado em até 15 dias quando a pessoa pede ou sai.
+Versão 1.2. Controladora: Studio Mega Treinamento LTDA, CNPJ 24.723.732/0001-78, Av. Raimundo Pereira de Magalhães, 12600, Sobreloja, CEP 02989-095, São Paulo/SP. Encarregado: Gilberto da Silva Júnior, professor.gilbertojr@gmail.com, (11) 97324-2972. Foro e assinatura: São Paulo.
 
-Ainda faltam, para tirar os colchetes:
+O painel completo é o login de administrador, usado pelos cargos de administrador, professor responsável e recepção. O aluno tem outro login, só da própria ficha. Quem pode dar aula é marcado só pelo administrador. Na foto, o padrão é Gilberto da Silva Júnior.
 
-1. Razão social, CNPJ e endereço.
-2. Nome, e-mail e telefone de quem apaga o rosto quando o aluno ou o responsável pede. Pode ser o dono.
-3. Quais cargos abrem a tela de chamada e o cadastro de rosto.
-4. Cidade em que o termo será assinado.
+Já estavam na versão anterior: hospedagem na Railway em US East (Virgínia, Estados Unidos); sem câmera fixa no tatame; este papel não autoriza publicação; lista de presença sem foto por 5 anos depois da saída; código do rosto apagado na hora pela própria pessoa, ou em até 15 dias quando o pedido é feito à recepção.
 
-O advogado da academia lê a versão já com esses dados antes da primeira criança ser cadastrada, inclusive o contrato da Railway e a transferência para os Estados Unidos.
+O advogado da academia lê esta versão antes da primeira criança ser cadastrada, inclusive o contrato da Railway e a transferência para os Estados Unidos.
