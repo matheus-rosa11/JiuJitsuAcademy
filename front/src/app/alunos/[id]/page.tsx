@@ -11,6 +11,7 @@ import { GraduationTimeline } from "@/components/GraduationTimeline";
 import { PaymentModal } from "@/components/PaymentModal";
 import { useToast } from "@/components/Toast";
 import { Avatar, Badge, Button, buttonClass, Card, CardHeader, ErrorState, ProgressBar, Spinner, rateTone } from "@/components/ui";
+import { useSession } from "@/components/Session";
 import { api, type Payment, type StudentDetail } from "@/lib/api";
 import { degreeLabel, formatCurrency, formatDate, paymentStatusLabel, studentTypeLabel } from "@/lib/format";
 import { useApi } from "@/lib/useApi";
@@ -19,6 +20,8 @@ const paymentTone = { Paid: "green", Pending: "amber", Overdue: "red" } as const
 
 export default function StudentPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useSession();
+  const isSelf = user?.role === "Student";
   const toast = useToast();
   const { data: student, error, reload } = useApi<StudentDetail>(`/students/${id}`);
   const [graduating, setGraduating] = useState(false);
@@ -93,10 +96,12 @@ export default function StudentPage() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 sm:flex-col sm:items-stretch">
-            <Button onClick={() => setGraduating(true)} disabled={!student.active}>
-              <Award className="size-4" />
-              Registrar graduação
-            </Button>
+            {!isSelf && (
+              <Button onClick={() => setGraduating(true)} disabled={!student.active}>
+                <Award className="size-4" />
+                Registrar graduação
+              </Button>
+            )}
             <Link href={`/alunos/${id}/editar`} className={buttonClass({ variant: "secondary" })}>
               <Pencil className="size-4" />
               Editar
@@ -201,11 +206,15 @@ export default function StudentPage() {
               {student.classes.length === 0 ? (
                 <p className="text-sm text-zinc-500">Não matriculado em turmas.</p>
               ) : (
-                student.classes.map((c) => (
-                  <Link key={c.id} href={`/presenca?turma=${c.id}`}>
-                    <Badge className="py-1">{c.name}</Badge>
-                  </Link>
-                ))
+                student.classes.map((c) =>
+                  isSelf ? (
+                    <Badge key={c.id} className="py-1">{c.name}</Badge>
+                  ) : (
+                    <Link key={c.id} href={`/presenca?turma=${c.id}`}>
+                      <Badge className="py-1">{c.name}</Badge>
+                    </Link>
+                  ),
+                )
               )}
             </div>
           </Card>
@@ -214,9 +223,11 @@ export default function StudentPage() {
             <CardHeader
               title="Pagamentos"
               action={
-                <Button variant="ghost" size="sm" onClick={() => setPaymentModal({})}>
-                  <Plus className="size-4" /> Novo
-                </Button>
+                !isSelf && (
+                  <Button variant="ghost" size="sm" onClick={() => setPaymentModal({})}>
+                    <Plus className="size-4" /> Novo
+                  </Button>
+                )
               }
             />
             {student.recentPayments.length === 0 ? (
@@ -225,14 +236,14 @@ export default function StudentPage() {
               <ul className="mt-2 divide-y divide-zinc-100">
                 {student.recentPayments.map((p) => (
                   <li key={p.id} className="flex items-center gap-3 px-5 py-2.5">
-                    <button className="min-w-0 flex-1 cursor-pointer text-left" onClick={() => setPaymentModal({ payment: p })}>
+                    <button className="min-w-0 flex-1 cursor-pointer text-left" onClick={() => !isSelf && setPaymentModal({ payment: p })}>
                       <p className="text-sm font-medium text-zinc-900">{formatCurrency(p.amount)}</p>
                       <p className="text-xs text-zinc-500">
                         Vence {formatDate(p.dueDate)}
                         {p.paidAt && ` · pago ${formatDate(p.paidAt)}`}
                       </p>
                     </button>
-                    {p.status !== "Paid" && (
+                    {!isSelf && p.status !== "Paid" && (
                       <Button size="sm" variant="secondary" onClick={() => markPaid(p)}>
                         Pagar
                       </Button>
@@ -251,7 +262,7 @@ export default function StudentPage() {
             </Card>
           )}
 
-          <div className="flex justify-end">
+          {!isSelf && <div className="flex justify-end">
             {student.active ? (
               <Button variant="danger" size="sm" onClick={() => confirm(`Desativar ${student.name}?`) && setActive(false)}>
                 <UserX className="size-4" /> Desativar aluno
@@ -261,7 +272,7 @@ export default function StudentPage() {
                 <UserCheck className="size-4" /> Reativar aluno
               </Button>
             )}
-          </div>
+          </div>}
         </div>
       </div>
 

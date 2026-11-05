@@ -318,6 +318,41 @@ namespace JiuJitsu.Api.Migrations
                     b.ToTable("Classes", (string)null);
                 });
 
+            modelBuilder.Entity("JiuJitsu.Api.Models.UserAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("StudentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("JiuJitsu.Api.Models.Attendance", b =>
                 {
                     b.HasOne("JiuJitsu.Api.Models.TrainingClass", "Class")
@@ -412,6 +447,16 @@ namespace JiuJitsu.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Responsible");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("JiuJitsu.Api.Models.UserAccount", b =>
+                {
+                    b.HasOne("JiuJitsu.Api.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Student");
                 });

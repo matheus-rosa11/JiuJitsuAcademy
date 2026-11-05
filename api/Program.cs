@@ -1,9 +1,12 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JiuJitsu.Api.Data;
 using JiuJitsu.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,9 +28,45 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 
-// No authentication yet. Registering authorization keeps the pipeline ready for
-// [Authorize] once an external provider (e.g. Google) is added.
-builder.Services.AddAuthorization();
+var signingKey = AuthService.SigningKey(builder.Configuration);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = AuthService.Issuer,
+            ValidateAudience = true,
+            ValidAudience = AuthService.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(2),
+            RoleClaimType = "role",
+            NameClaimType = "sub"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsJsonAsync(new { message = "Entre na sua conta para continuar." });
+            },
+            OnForbidden = async context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsJsonAsync(new { message = "Você não tem acesso a isto." });
+            }
+        };
+    });
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(ResolveConnectionString(builder.Configuration)));
@@ -39,6 +78,7 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<ClassService>();
 builder.Services.AddScoped<ResponsibleService>();
+builder.Services.AddScoped<AuthService>();
 
 var corsOrigins = builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:3000";
 builder.Services.AddCors(options =>
@@ -60,6 +100,8 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
     {
         DomainException ex => (StatusCodes.Status400BadRequest, ex.Message),
         NotFoundException ex => (StatusCodes.Status404NotFound, ex.Message),
+        ForbiddenException ex => (StatusCodes.Status403Forbidden, ex.Message),
+        UnauthorizedException ex => (StatusCodes.Status401Unauthorized, ex.Message),
         DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } } =>
             (StatusCodes.Status409Conflict, "Registro duplicado."),
         _ => (StatusCodes.Status500InternalServerError, "Erro inesperado. Tente novamente.")
@@ -80,9 +122,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("Frontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" })).AllowAnonymous();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -91,6 +134,7 @@ using (var scope = app.Services.CreateScope())
 
     var seedDemoData = !string.Equals(app.Configuration["SEED_DEMO_DATA"], "false", StringComparison.OrdinalIgnoreCase);
     await DbSeeder.SeedAsync(db, seedDemoData);
+    await AuthService.EnsureAdminsAsync(db, app.Configuration);
 }
 
 app.Run();

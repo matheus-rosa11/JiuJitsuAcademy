@@ -4,9 +4,11 @@ import { Baby, Plus, Star, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { api, type Belt, type Responsible, type StudentDetail, type StudentType, type TrainingClass } from "@/lib/api";
+import type { SessionUser } from "./Session";
 import { ageFrom, formatDays, todayIso } from "@/lib/format";
 import { useApi } from "@/lib/useApi";
 import { BeltPicker, DegreePicker } from "./BeltPicker";
+import { useSession } from "./Session";
 import { useToast } from "./Toast";
 import { Button, Card, cn, Field, Input, Select, Spinner, Textarea } from "./ui";
 
@@ -32,10 +34,12 @@ function Section({ title, description, children }: { title: string; description?
   );
 }
 
-export function StudentForm({ initial }: { initial?: StudentDetail }) {
+export function StudentForm({ initial, selfService = false }: { initial?: StudentDetail; selfService?: boolean }) {
   const router = useRouter();
+  const { refresh } = useSession();
   const toast = useToast();
   const isEdit = !!initial;
+  const [password, setPassword] = useState("");
 
   const [type, setType] = useState<StudentType>(initial?.studentType ?? "Adult");
   const [name, setName] = useState(initial?.name ?? "");
@@ -120,8 +124,8 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
         currentDegree: effectiveDegree,
         monthlyFee: Number(monthlyFee.replace(",", ".")) || 0,
         notes: notes || null,
-        isProfessor: isProfessor || isPrincipal,
-        isPrincipalProfessor: isPrincipal,
+        isProfessor: selfService ? false : isProfessor || isPrincipal,
+        isPrincipalProfessor: selfService ? false : isPrincipal,
         classIds: classIds.filter((id) => compatibleClasses.some((c) => c.id === id)),
         responsibles:
           type === "Child"
@@ -135,6 +139,30 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
               }))
             : [],
       };
+      if (selfService && !isEdit) {
+        if (password.length < 8) {
+          toast("A senha precisa ter pelo menos 8 caracteres.", "error");
+          setSaving(false);
+          return;
+        }
+        const account = await api<SessionUser>("/auth/register", {
+          method: "POST",
+          body: {
+            name,
+            email,
+            password,
+            birthDate,
+            phone: phone || null,
+            currentBeltId: belt.id,
+            currentDegree: effectiveDegree,
+            notes: notes || null,
+            classIds: body.classIds,
+          },
+        });
+        refresh();
+        router.push(`/alunos/${account.studentId}/rosto`);
+        return;
+      }
       const saved = await api<StudentDetail>(isEdit ? `/students/${initial.id}` : "/students", {
         method: isEdit ? "PUT" : "POST",
         body,
@@ -155,7 +183,7 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
 
   return (
     <form onSubmit={submit} className="space-y-5">
-      <Section title="Tipo de aluno" description="Define o sistema de faixas (adulto ou infantil) e se há responsáveis.">
+      {!selfService && <Section title="Tipo de aluno" description="Define o sistema de faixas (adulto ou infantil) e se há responsáveis.">
         <div className="grid grid-cols-2 gap-3">
           {(
             [
@@ -180,7 +208,7 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
             </button>
           ))}
         </div>
-      </Section>
+      </Section>}
 
       <Section title="Dados pessoais">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -209,8 +237,13 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
             <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(11) 99999-9999" />
           </Field>
           <Field label="E-mail">
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" />
+            <Input required={selfService} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@exemplo.com" />
           </Field>
+          {selfService && !isEdit && (
+            <Field label="Senha" hint="Mínimo de 8 caracteres. É com ela que você volta depois." className="sm:col-span-2">
+              <Input required type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            </Field>
+          )}
         </div>
       </Section>
 
@@ -236,7 +269,7 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
         )}
       </Section>
 
-      <Section
+      {!selfService && <Section
         title="Aula"
         description="Quem dá aula usa este mesmo cadastro e o mesmo rosto. Fora da turma, o rosto aparece na foto e não entra na presença."
       >
@@ -270,9 +303,9 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
             </span>
           </label>
         )}
-      </Section>
+      </Section>}
 
-      {type === "Child" && (
+      {!selfService && type === "Child" && (
         <Section title="Responsáveis" description="Um responsável pode estar vinculado a vários alunos (irmãos).">
           <div className="space-y-3">
             {responsibles.map((r) => (
@@ -390,12 +423,14 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
         )}
       </Section>
 
-      <Section title="Mensalidade e observações">
+      <Section title={selfService ? "Observações" : "Mensalidade e observações"}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Mensalidade (R$)">
-            <Input inputMode="decimal" value={monthlyFee} onChange={(e) => setMonthlyFee(e.target.value)} placeholder="180,00" />
-          </Field>
-          {isEdit && (
+          {!selfService && (
+            <Field label="Mensalidade (R$)">
+              <Input inputMode="decimal" value={monthlyFee} onChange={(e) => setMonthlyFee(e.target.value)} placeholder="180,00" />
+            </Field>
+          )}
+          {!selfService && isEdit && (
             <Field label="Situação">
               <Select value={active ? "1" : "0"} onChange={(e) => setActive(e.target.value === "1")}>
                 <option value="1">Ativo</option>
@@ -414,7 +449,7 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
           Cancelar
         </Button>
         <Button type="submit" loading={saving} disabled={!belt}>
-          {isEdit ? "Salvar alterações" : "Cadastrar aluno"}
+          {selfService && !isEdit ? "Criar conta" : isEdit ? "Salvar alterações" : "Cadastrar aluno"}
         </Button>
       </div>
     </form>
