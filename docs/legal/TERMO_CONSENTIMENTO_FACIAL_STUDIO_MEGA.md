@@ -2,11 +2,11 @@
 
 **Studio Mega — reconhecimento facial na chamada da aula**
 
-Versão da minuta: 1.0  
+Versão da minuta: 1.1  
 Data: 5 de novembro de 2026  
 Controladora (nome fantasia): Studio Mega
 
-Esta minuta descreve o tratamento que o sistema da academia realmente faz hoje: três capturas para montar um perfil do rosto, sem guardar a fotografia do cadastro; foto da turma usada só para sugerir a presença, sem ficar armazenada; presença confirmada pelo professor. Não autoriza post, anúncio, site nem federação.
+Esta minuta descreve o tratamento que o sistema da academia realmente faz hoje: três capturas para montar um perfil do rosto, sem guardar a fotografia do cadastro; foto da turma usada só para sugerir a presença, sem ficar armazenada; presença confirmada pelo professor. O banco e o restante da aplicação ficam na Railway, região US East, Virgínia, Estados Unidos. Não há câmera fixa no tatame. Assinar este papel não autoriza publicação da imagem.
 
 ---
 
@@ -23,21 +23,16 @@ Preencher:
 | [RAZÃO SOCIAL] | Nome empresarial do contrato social, não só “Studio Mega” |
 | [CNPJ] | CNPJ da pessoa jurídica que é a dona do sistema e da academia |
 | [ENDEREÇO] | Endereço completo da sede e, se for diferente, o do tatame |
-| [E-MAIL DE PRIVACIDADE] | Caixa que uma pessoa real lê, para pedidos de exclusão |
+| [E-MAIL DE PRIVACIDADE] | Caixa que uma pessoa real lê. É para onde o aluno ou o responsável escreve “apague o código do rosto” |
 | [TELEFONE] | Telefone do mesmo atendimento |
-| [NOME DO ENCARREGADO] | Pessoa encarregada pelo tratamento (art. 41 da LGPD), mesmo que a ANPD dispense agente de pequeno porte em algum ponto: para biometria de criança, nomear alguém |
+| [NOME DO ENCARREGADO] | Quem recebe esse pedido e apaga o perfil no sistema. Pode ser o próprio dono. Não é um cargo público nem um pedido judicial |
 | [CIDADE DA ASSINATURA] | Cidade onde o termo é assinado |
-| [PRAZO DA PRESENÇA] | Proposta desta minuta: 5 anos após o desligamento, só para o registro de presença sem imagem. Confirmar com o advogado |
-| [PAÍS E REGIÃO DO SERVIDOR] | Onde ficam o banco dos alunos, o arquivo dos perfis de rosto e os backups. Se não for o Brasil, não comece o uso com criança antes de fechar a transferência internacional |
-| [OPERADORES] | Quem hospeda o sistema (por exemplo o provedor de nuvem), com país e o que cada um enxerga |
 
 O que esta minuta não substitui:
 
-- registro das operações de tratamento e relatório de impacto (RIPD), pedido ou não pela ANPD, porque reconhecimento facial de criança é alto risco;
-- contrato escrito com quem hospeda o sistema, com dever de sigilo, segurança e exclusão;
-- confirmação de que o servidor e o backup estão no Brasil, ou cláusulas-padrão de transferência se não estiverem;
-- procedimento interno de exclusão do perfil do rosto em prazo curto;
-- política de não publicar rosto de aluno, em especial de criança, em rede social, site, cartaz e grupo de WhatsApp aberto.
+- registro das operações de tratamento e relatório de impacto (RIPD), porque reconhecimento facial de criança é alto risco;
+- leitura, por advogado, do contrato da Railway à luz do regulamento de transferência internacional da ANPD (Resolução CD/ANPD nº 19/2024 e alterações). O consentimento em destaque para guardar o dado nos Estados Unidos está neste termo; o contrato com a hospedagem é a camada que o advogado confere;
+- procedimento interno para apagar o perfil do rosto em até 15 dias quando a pessoa pedir ou sair.
 
 ---
 
@@ -51,7 +46,7 @@ O que acontece na prática:
 
 1. No cadastro, a pessoa olha para a câmera de frente, depois para um lado e depois para o outro. O sistema transforma cada vista em um código numérico do rosto. A foto dessas três vistas não fica gravada.
 2. Na aula, o professor pode tirar ou enviar uma foto do grupo. O sistema compara os rostos dessa foto com os códigos de quem está naquela turma e, se for o caso, com quem pode dar aula. A foto do grupo não fica gravada. O professor confirma a lista. Ninguém é lançado como ausente só porque o rosto não apareceu.
-3. O que fica guardado é o código do rosto, ligado ao cadastro da pessoa, e a lista de presença (nome, turma, data e se estava presente). Não fica um álbum de fotos.
+3. O que fica guardado é o código do rosto, ligado ao cadastro da pessoa, e a lista de presença (nome, turma, data e se estava presente). Não fica um álbum de fotos. Esse cadastro e esse código ficam em servidor da Railway nos Estados Unidos, região US East, no estado da Virgínia. Não há cópia deste sistema no Brasil. Autorizar a chamada e autorizar essa guarda nos Estados Unidos são dois sim separados, na folha de assinatura.
 
 O que o Studio Mega não faz com esse rosto:
 
@@ -65,9 +60,9 @@ Dá para treinar sem isso. Se a pessoa não autorizar, ou se revogar depois, a c
 
 Criança e adolescente (menos de 18 anos) só entram nesse fluxo com a autorização de quem é pai, mãe ou responsável legal, além da explicação simples para o próprio menor. Recusar não impede a criança de treinar.
 
-A autorização vale até o desligamento, ou até a pessoa (ou o responsável) pedir para parar. O código do rosto é apagado nesse momento. O pedido pode ser feito em [E-MAIL DE PRIVACIDADE] ou na recepção.
+A autorização vale até o desligamento, ou até a pessoa (ou o responsável) pedir para apagar o rosto. Apagar o rosto é um pedido feito à recepção ou ao e-mail [E-MAIL DE PRIVACIDADE]. Não é processo, não é ordem judicial e não cancela a matrícula. O código do rosto sai do sistema em até 15 dias. A lista de presença já lançada, sem foto, pode continuar guardada por 5 anos depois da saída, só com nome, turma, data e presente ou ausente.
 
-O texto completo está nas Partes B a F. A divulgação de imagem para fora da academia, se um dia existir, é outra autorização, separada, na Parte E, e o padrão é não autorizar.
+O texto completo está nas Partes B a F. Este papel não autoriza publicar foto em lugar nenhum.
 
 ---
 
@@ -81,7 +76,7 @@ O texto completo está nas Partes B a F. A divulgação de imagem para fora da a
 
 1.3. “Aluno” inclui adulto e criança ou adolescente matriculado. “Professor” inclui quem dá aula e tem o rosto cadastrado para ser reconhecido na foto, esteja ou não na lista de presença da turma. O mesmo termo vale para os dois, porque o rosto segue o mesmo caminho.
 
-1.4. Operadores são as empresas que guardam ou processam o sistema por conta da controladora, hoje: [OPERADORES], no país e na região [PAÍS E REGIÃO DO SERVIDOR]. Elas não decidem a finalidade. Não há operador autorizado a usar o rosto para o produto dele.
+1.4. A hospedagem da aplicação e do banco de dados é a plataforma Railway, na região US East, Virgínia, Estados Unidos da América. O banco dos alunos, o arquivo dos códigos de rosto e o restante do sistema ficam nessa região. A Railway não decide a finalidade e não está autorizada a usar o rosto para produto próprio. Não há câmera fixa no tatame; este termo não trata de vigilância contínua.
 
 ### 2. Quais dados entram
 
@@ -173,22 +168,24 @@ O texto completo está nas Partes B a F. A divulgação de imagem para fora da a
 
 - revogação do consentimento;
 - desligamento do aluno ou do professor;
-- pedido de exclusão do perfil facial, mesmo que a pessoa continue treinando;
+- pedido da pessoa, ou do responsável, para apagar o código do rosto, mesmo que ela continue treinando;
 - constatação de que o cadastro foi feito sem a autorização exigida nesta minuta.
 
 8.3. O apagamento do código ocorre em até 15 dias corridos do fato. A confirmação é enviada a quem pediu, no contato informado, salvo se a pessoa dispensar.
 
-8.4. A lista de presença já salva, sem foto e sem código de rosto, pode ser conservada por [PRAZO DA PRESENÇA] após o desligamento, só para histórico da relação e defesa de direitos. Findo o prazo, esse registro é eliminado ou anonimizado, salvo obrigação legal específica que mande guardar por mais tempo. Essa conservação não mantém o rosto.
+8.4. A lista de presença já salva, sem foto e sem código de rosto, fica guardada por 5 anos depois do desligamento. O que resta nesse prazo é nome, turma, data e se a pessoa estava presente ou ausente, para histórico da relação e para uma discussão futura (mensalidade, frequência, acidente). Findo o prazo, esse registro é eliminado ou anonimizado, salvo obrigação legal específica que mande guardar por mais tempo. Essa conservação não mantém o rosto.
 
 8.5. Backup que ainda contenha o código é eliminado ou sobrescrito no ciclo ordinário de retenção de backup, que não pode passar de 30 dias após o apagamento no sistema principal. Nesse intervalo o backup não é usado para restaurar o perfil de quem revogou.
 
 ### 9. Onde o dado fica
 
-9.1. O tratamento descrito aqui é feito no ambiente indicado em [PAÍS E REGIÃO DO SERVIDOR].
+9.1. O banco dos alunos, o arquivo dos códigos de rosto e o restante da aplicação ficam na Railway, região US East, Virgínia, Estados Unidos da América. A Railway não oferece região no Brasil para este projeto. Backup feito nessa mesma hospedagem permanece nos Estados Unidos.
 
-9.2. Se esse ambiente, ou o backup, estiver fora do Brasil, a transferência só ocorre com mecanismo válido na Lei nº 13.709/2018 e no regulamento de transferência internacional da ANPD vigente, em contrato escrito com o operador. Enquanto isso não estiver assinado e arquivado, o Studio Mega não cadastra rosto de criança ou de adolescente.
+9.2. Guardar o dado nesse servidor é transferência internacional de dado pessoal. A base desta minuta para essa transferência é o consentimento específico e em destaque, separado da autorização de uso na chamada, com a informação prévia de que a operação é internacional (Lei nº 13.709/2018, art. 33, VIII). Sem a caixa própria da Virgínia marcada na Parte C ou na Parte D, o rosto não é cadastrado.
 
-9.3. Não se envia o código nem a imagem para serviço de identificação facial de uso geral na internet.
+9.3. O advogado da academia confere, à parte, se o contrato da Railway atende também o regulamento de transferência internacional da ANPD, em especial as cláusulas-padrão contratuais. Essa conferência não substitui a caixa de ciência assinada pela pessoa.
+
+9.4. A imagem do cadastro e a foto da aula não são enviadas a um serviço público de identificação facial na internet. O cálculo do código roda no servidor da academia nessa mesma região.
 
 ### 10. Segurança e incidente
 
@@ -224,7 +221,7 @@ O texto completo está nas Partes B a F. A divulgação de imagem para fora da a
 
 12.3. Refazer as três vistas, porque a luz ficou ruim ou a pessoa mudou, usa a mesma autorização, desde que a finalidade não mude. Mudou a finalidade, muda o termo.
 
-12.4. Esta versão é a 1.0, de 5 de novembro de 2026. Versão nova não aproveita silêncio de quem já assinou: ou a mudança é só de forma, e a academia informa, ou a mudança é de finalidade, operador relevante ou tipo de dado, e há pedido novo de consentimento.
+12.4. Esta versão é a 1.1, de 5 de novembro de 2026. Versão nova não aproveita silêncio de quem já assinou: ou a mudança é só de forma, e a academia informa, ou a mudança é de finalidade, de país do servidor ou de tipo de dado, e há pedido novo de consentimento.
 
 ### 13. Canal e foro
 
@@ -248,13 +245,17 @@ Li a Parte A em destaque e a Parte B. Sei que o rosto vira um código interno de
 
 [ ] Autorizo o cadastro do meu rosto só para a chamada interna descrita neste termo.
 
+[ ] Sei que o cadastro e o código do rosto ficam em servidor nos Estados Unidos (Virgínia), na Railway, e autorizo essa guarda só para a chamada interna.
+
 [ ] Não autorizo. A chamada do meu nome será manual.
+
+As duas primeiras caixas precisam estar marcadas para o rosto ser cadastrado. Marcar só uma delas não basta.
 
 Local e data: [CIDADE DA ASSINATURA], ______ / ______ / __________
 
 Assinatura: _______________________________________________
 
-Via da academia. A outra via fica com a pessoa. Versão da minuta: 1.0.
+Via da academia. A outra via fica com a pessoa. Versão da minuta: 1.1.
 
 ---
 
@@ -276,7 +277,11 @@ Declaro que tenho condições legais de autorizar este tratamento. Se houver out
 
 [ ] Autorizo o código do rosto do menor só para a chamada interna.
 
+[ ] Sei que o cadastro e o código do rosto do menor ficam em servidor nos Estados Unidos (Virgínia), na Railway, e autorizo essa guarda só para a chamada interna.
+
 [ ] Não autorizo. A chamada será manual.
+
+As duas primeiras caixas precisam estar marcadas para o rosto ser cadastrado. Marcar só uma delas não basta.
 
 Ciência do menor, quando ele já consegue compreender (obrigatória a partir dos 12 anos, e antes disso sempre que possível). Frase lida para ele: “Vamos guardar um código do seu rosto, não a foto, só para ver se você veio na aula. Se você não quiser, a aula continua.”
 
@@ -289,35 +294,25 @@ Assinatura do responsável: _______________________________________________
 
 Segunda assinatura, quando houver dois genitores: _______________________________________________
 
-Versão da minuta: 1.0. Uma via fica com a família.
+Versão da minuta: 1.1. Uma via fica com a família.
 
 ---
 
-## Parte E — Divulgação de imagem (não faz parte da chamada)
+## Parte E — O que este papel não autoriza
 
-Esta parte não é necessária para o reconhecimento facial. O padrão do Studio Mega é não publicar. Se a academia um dia quiser usar imagem em rede social, site ou cartaz, isso é outro pedido, com a peça definida. Para menor de 18 anos, esta parte não é usada: divulgação de imagem de menor só com termo próprio, que mostre a imagem exata, o lugar e o prazo, assinado por quem tem o poder familiar.
-
-Para maior de 18 anos, e só se a pessoa quiser:
-
-[ ] Não autorizo uso da minha imagem fora da chamada interna.
-
-[ ] Autorizo o uso da imagem específica descrita abaixo, e de mais nenhuma.
-
-Descrição da peça (qual foto, onde será publicada, por quanto tempo): _______________________________________________
-
-Essa autorização não cobre o código biométrico, não obriga a pessoa a nada, pode ser revogada, e a peça já publicada é retirada na medida do que a plataforma permitir, em até 15 dias do pedido.
-
-Assinatura opcional: _______________________________________________ Data: ______________
+Este termo é só o reconhecimento facial da chamada. A assinatura não autoriza uso da imagem fora disso: rede social, site, cartaz, anúncio, grupo de mensagem ou federação. Publicação de foto, se a academia fizer em outro momento, não usa este documento.
 
 ---
 
-## Parte F — Revogação e pedido de exclusão
+## Parte F — Pedido para apagar o rosto
+
+“Apagar o rosto” é o aluno, o professor ou o responsável pedindo para o Studio Mega eliminar o código do rosto. Faz na recepção ou por e-mail. A aula pode continuar, com chamada manual. Não é ação judicial.
 
 À [RAZÃO SOCIAL] (Studio Mega), [E-MAIL DE PRIVACIDADE].
 
 Eu, _______________________________________________, CPF _______________, peço:
 
-[ ] a exclusão do código de rosto de _______________________________________________ (nome do titular; se for menor, indicar o menor e assinar como responsável);
+[ ] apagar o código de rosto de _______________________________________________ (nome da pessoa; se for menor, indicar o menor e assinar como responsável);
 
 [ ] a manutenção da matrícula e da chamada manual;
 
@@ -341,13 +336,13 @@ Isto não é entregue para assinatura. É o que a academia precisa fazer para o 
 2. No cadastro da criança, não seguir se o menor se opuser.
 3. Não condicionar a matrícula, a mensalidade ou a graduação ao rosto.
 4. Não salvar a foto da turma no celular, no WhatsApp ou na galeria. Se o sistema operacional guardar a imagem, apagar em seguida.
-5. Não publicar rosto de aluno. Em especial, não publicar criança.
-6. Quem sai, revoga ou pede exclusão: apagar o perfil facial no sistema em até 15 dias e anotar na Parte F.
-7. Não restaurar de backup o perfil de quem revogou.
-8. Não cadastrar rosto de criança enquanto [PAÍS E REGIÃO DO SERVIDOR] não estiver confirmado e, se for fora do Brasil, enquanto o contrato de transferência não estiver assinado.
+5. Não usar este termo como autorização de publicação. Foto para rede social fica fora deste papel.
+6. Quem sai, pede para apagar o rosto ou revoga: apagar o perfil facial no sistema em até 15 dias e anotar na Parte F. Quem recebe esse pedido é [NOME DO ENCARREGADO].
+7. Não restaurar de backup o perfil de quem pediu para apagar.
+8. Não cadastrar rosto se a caixa da Virgínia estiver em branco. As duas caixas de autorização da Parte C ou da Parte D precisam estar marcadas.
 9. Acesso à tela de chamada só de quem dá a aula ou da secretaria. Sair da conta ao terminar.
 10. Incidente (vazamento de cadastro, celular com fotos da turma, perfil exposto): avisar [NOME DO ENCARREGADO] no mesmo dia, para avaliar comunicação à ANPD e aos titulares.
-11. Guardar esta minuta versão 1.0 junto de cada aceite, para saber qual texto a pessoa viu.
+11. Guardar esta minuta versão 1.1 junto de cada aceite, para saber qual texto a pessoa viu.
 12. Uma vez por ano, revisar se o sistema ainda faz só o que a cláusula 3 descreve. Se passar a guardar foto, a ligar câmera o tempo todo ou a publicar imagem, parar e fazer termo novo.
 
 Descrição técnica que esta rotina considera verdadeira, e que deixa de valer se o software mudar:
@@ -362,16 +357,15 @@ Descrição técnica que esta rotina considera verdadeira, e que deixa de valer 
 
 ---
 
-## Parte H — O que ainda falta você me passar
+## Parte H — O que ainda falta o dono passar
 
-Sem estes dados a minuta não pode sair da gaveta:
+Já entraram nesta versão 1.1: hospedagem na Railway em US East (Virgínia, Estados Unidos); ausência de câmera fixa no tatame; este papel não trata de rede social; lista de presença sem foto guardada por 5 anos depois da saída; código do rosto apagado em até 15 dias quando a pessoa pede ou sai.
 
-1. Razão social, CNPJ e endereço da sede e do tatame, se forem diferentes.
-2. Nome de quem será o encarregado, e o e-mail e o telefone que a recepção de fato atende.
-3. País e região do servidor dos alunos, do arquivo de perfis de rosto e do backup. Se for fora do Brasil, o nome do provedor e se já existe contrato com cláusula de transferência.
-4. Confirmação do prazo de guarda da lista de presença sem imagem. A proposta é 5 anos depois do desligamento.
-5. Se a academia hoje publica aluno em Instagram, site ou grupo de WhatsApp. Se publica, esse hábito tem de parar ou ganhar autorização própria. Este termo não cobre esse uso, e para criança ele não serve.
-6. Se existe câmera fixa no tatame. Se existe, ela não entra nesta minuta e precisa de aviso separado.
-7. Quem, pelo nome do cargo, pode abrir a tela de chamada e o cadastro de rosto.
+Ainda faltam, para tirar os colchetes:
 
-Com esses sete itens dá para fechar a versão de assinatura. O advogado da academia deve ler antes da primeira criança ser cadastrada.
+1. Razão social, CNPJ e endereço.
+2. Nome, e-mail e telefone de quem apaga o rosto quando o aluno ou o responsável pede. Pode ser o dono.
+3. Quais cargos abrem a tela de chamada e o cadastro de rosto.
+4. Cidade em que o termo será assinado.
+
+O advogado da academia lê a versão já com esses dados antes da primeira criança ser cadastrada, inclusive o contrato da Railway e a transferência para os Estados Unidos.
