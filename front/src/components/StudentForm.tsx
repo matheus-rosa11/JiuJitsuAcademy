@@ -48,6 +48,8 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
   const [degree, setDegree] = useState(initial?.currentDegree ?? 0);
   const [monthlyFee, setMonthlyFee] = useState(String(initial?.monthlyFee ?? ""));
   const [notes, setNotes] = useState(initial?.notes ?? "");
+  const [isProfessor, setIsProfessor] = useState(initial?.isProfessor ?? false);
+  const [isPrincipal, setIsPrincipal] = useState(initial?.isPrincipalProfessor ?? false);
   const [classIds, setClassIds] = useState<string[]>(initial?.classes.map((c) => c.id) ?? []);
   const [responsibles, setResponsibles] = useState<ResponsibleRow[]>(
     initial?.responsibles.map((r) => ({
@@ -118,6 +120,8 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
         currentDegree: effectiveDegree,
         monthlyFee: Number(monthlyFee.replace(",", ".")) || 0,
         notes: notes || null,
+        isProfessor: isProfessor || isPrincipal,
+        isPrincipalProfessor: isPrincipal,
         classIds: classIds.filter((id) => compatibleClasses.some((c) => c.id === id)),
         responsibles:
           type === "Child"
@@ -229,6 +233,42 @@ export function StudentForm({ initial }: { initial?: StudentDetail }) {
               </p>
             )}
           </div>
+        )}
+      </Section>
+
+      <Section
+        title="Aula"
+        description="Quem dá aula usa este mesmo cadastro e o mesmo rosto. Fora da turma, o rosto aparece na foto e não entra na presença."
+      >
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            className="mt-0.5 size-4 accent-zinc-900"
+            checked={isProfessor}
+            onChange={(event) => {
+              const next = event.target.checked;
+              setIsProfessor(next);
+              if (!next) setIsPrincipal(false);
+            }}
+          />
+          <span>
+            <span className="text-sm font-medium text-zinc-900">Pode dar aula</span>
+            <span className="mt-0.5 block text-xs text-zinc-500">Um aluno que começa a dar aula continua com o cadastro que já tem.</span>
+          </span>
+        </label>
+        {isProfessor && (
+          <label className="mt-4 flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              className="mt-0.5 size-4 accent-zinc-900"
+              checked={isPrincipal}
+              onChange={(event) => setIsPrincipal(event.target.checked)}
+            />
+            <span>
+              <span className="text-sm font-medium text-zinc-900">Professor principal</span>
+              <span className="mt-0.5 block text-xs text-zinc-500">Só um na academia. Na foto, ele é o professor da aula. Se não aparecer, vale a faixa mais alta.</span>
+            </span>
+          </label>
         )}
       </Section>
 

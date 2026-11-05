@@ -199,6 +199,12 @@ namespace JiuJitsu.Api.Migrations
                         .HasMaxLength(160)
                         .HasColumnType("character varying(160)");
 
+                    b.Property<bool>("IsPrincipalProfessor")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsProfessor")
+                        .HasColumnType("boolean");
+
                     b.Property<DateOnly>("JoinedAt")
                         .HasColumnType("date");
 

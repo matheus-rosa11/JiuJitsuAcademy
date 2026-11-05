@@ -74,6 +74,7 @@ class RecognizeIn(BaseModel):
 class AttendanceIn(BaseModel):
     imageBase64: str = Field(min_length=20)
     candidateStudentIds: list[str]
+    instructorStudentIds: list[str] = []
 
 
 def _student_id(value: str) -> str:
@@ -237,7 +238,12 @@ def attendance(body: AttendanceIn):
     except ImageError as exc:
         raise HTTPException(status_code=422, detail={"message": message_for(exc.code), "code": exc.code}) from exc
     candidate_ids = _candidate_ids(body.candidateStudentIds) or []
-    faces_out, enrolled = _match(image, candidate_ids)
-    roll = assemble_roll(candidate_ids, faces_out, enrolled)
+    instructor_ids = _candidate_ids(body.instructorStudentIds) or []
+    pool: list[str] = []
+    for student_id in [*candidate_ids, *instructor_ids]:
+        if student_id not in pool:
+            pool.append(student_id)
+    faces_out, enrolled = _match(image, pool)
+    roll = assemble_roll(candidate_ids, faces_out, enrolled, instructor_ids)
     roll["elapsedMs"] = int((time.perf_counter() - started) * 1000)
     return roll

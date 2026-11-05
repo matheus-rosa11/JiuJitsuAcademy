@@ -8,11 +8,18 @@ who was absent.
 from __future__ import annotations
 
 
-def assemble_roll(candidate_ids: list[str], faces: list[dict], enrolled_ids: set[str]) -> dict:
+def assemble_roll(
+    candidate_ids: list[str],
+    faces: list[dict],
+    enrolled_ids: set[str],
+    instructor_ids: list[str] | None = None,
+) -> dict:
     ordered: list[str] = []
     for student_id in candidate_ids:
         if student_id not in ordered:
             ordered.append(student_id)
+    roster = set(ordered)
+    instructor_only = {student_id for student_id in (instructor_ids or []) if student_id not in roster}
 
     claims: dict[str, list[int]] = {}
     for index, face in enumerate(faces):
@@ -26,7 +33,20 @@ def assemble_roll(candidate_ids: list[str], faces: list[dict], enrolled_ids: set
     for index, face in enumerate(faces):
         student_id = face.get("studentId")
         decision = face.get("decision")
+        off_roster_instructor = student_id in instructor_only
+        confident_instructor = (
+            off_roster_instructor
+            and decision == "MATCHED"
+            and student_id not in conflicted
+            and not face.get("ambiguous")
+        )
         if decision == "UNKNOWN" or not student_id:
+            role = "unknown"
+            student_id = None
+        elif confident_instructor:
+            role = "instructor"
+        elif off_roster_instructor:
+            # An unsure professor is not named and does not become an attendance row.
             role = "unknown"
             student_id = None
         elif student_id in conflicted or decision == "REVIEW" or face.get("ambiguous"):

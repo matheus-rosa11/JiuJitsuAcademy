@@ -109,11 +109,12 @@ Na tela de presença da turma, o professor usa “Tirar foto” ou “Enviar fot
 ```json
 {
   "imageBase64": "<foto coletiva>",
-  "candidateStudentIds": ["id-1", "id-2"]
+  "candidateStudentIds": ["id-1", "id-2"],
+  "instructorStudentIds": ["id-do-professor"]
 }
 ```
 
-`candidateStudentIds` é obrigatório. Não há fallback para a academia inteira. Lista vazia devolve os rostos como desconhecidos e nenhum aluno.
+`candidateStudentIds` é obrigatório. Não há fallback para a academia inteira. Lista vazia devolve os rostos como desconhecidos e nenhum aluno. `instructorStudentIds` é opcional: pessoas que podem dar aula e não estão na lista da turma. Um `MATCHED` único delas volta com `role` `instructor`, fora de `students` e fora da contagem de rostos sem nome. Dúvida ou ambiguidade não recebe esse papel.
 
 A rota não grava presença na API .NET. Ela devolve sugestões.
 
@@ -124,6 +125,7 @@ Cada rosto em `faces` tem `role`:
 | `suggested` | Um único `MATCHED`, sem outro rosto reivindicando a mesma pessoa. Pode ser aplicado como presença depois que o professor aceitar. |
 | `review` | `REVIEW`, dois nomes muito próximos, ou dois rostos apontando para o mesmo aluno. Mostrar a dúvida. Não marcar presença sozinho. |
 | `unknown` | Sem nome. Não forçar um aluno da lista. O professor pode atribuir, se reconhecer a pessoa. |
+| `instructor` | Professor reconhecido que não está na lista da turma. Não é presença e não é rosto sem nome. |
 
 Cada aluno da lista em `students` tem `status`:
 

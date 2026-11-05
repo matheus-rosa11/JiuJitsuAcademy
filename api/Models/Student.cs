@@ -9,6 +9,10 @@ public class Student
     public string? Email { get; set; }
     public DateOnly JoinedAt { get; set; }
     public bool Active { get; set; } = true;
+    /// <summary>This person can teach. The same record and the same face profile are reused.</summary>
+    public bool IsProfessor { get; set; }
+    /// <summary>The academy owner. At most one student has this set. Chosen first when a class photo names the instructor.</summary>
+    public bool IsPrincipalProfessor { get; set; }
     public StudentType StudentType { get; set; }
     public Guid CurrentBeltId { get; set; }
     public int CurrentDegree { get; set; }

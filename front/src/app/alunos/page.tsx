@@ -124,7 +124,10 @@ function StudentsPage() {
                     <Avatar name={s.name} tone={s.studentType === "Child" ? "sky" : "zinc"} />
                     <div className="min-w-0">
                       <p className="truncate font-medium text-zinc-900">{s.name}</p>
-                      <p className="text-xs text-zinc-500">{s.age} anos</p>
+                      <p className="text-xs text-zinc-500">
+                        {s.age} anos
+                        {s.isPrincipalProfessor ? " · Professor principal" : s.isProfessor ? " · Professor" : ""}
+                      </p>
                     </div>
                   </div>
                   <div className="md:order-none">

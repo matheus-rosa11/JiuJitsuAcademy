@@ -6,7 +6,7 @@ export interface PhotoAssignment {
 export type FaceReading = "recognized" | "review" | "missing" | "no_profile";
 
 export interface RollFace {
-  role: "suggested" | "review" | "unknown";
+  role: "suggested" | "review" | "unknown" | "instructor";
   studentId: string | null;
   ambiguous?: boolean;
   candidates?: { studentId: string; decision: string }[];
@@ -88,6 +88,49 @@ export function absenceWarning(names: string[]): string | null {
     return `Salvar agora grava este aluno como ausente: ${shown}. A foto não confirma falta. Continuar?`;
   }
   return `Salvar agora grava estes alunos como ausentes: ${shown}${extra}. A foto não confirma falta. Continuar?`;
+}
+
+export interface InstructorPerson {
+  id: string;
+  name: string;
+  beltOrder: number;
+  degree: number;
+  isPrincipal: boolean;
+}
+
+function rankInstructors(a: InstructorPerson, b: InstructorPerson) {
+  if (b.beltOrder !== a.beltOrder) return b.beltOrder - a.beltOrder;
+  if (b.degree !== a.degree) return b.degree - a.degree;
+  return a.name.localeCompare(b.name, "pt-BR");
+}
+
+/** Professors whose face was a confident match, principal first, then highest belt. */
+export function matchedInstructors(
+  professors: InstructorPerson[],
+  faces: { role: string; studentId: string | null }[],
+): InstructorPerson[] {
+  const matched = new Set(
+    faces
+      .filter((face) => (face.role === "instructor" || face.role === "suggested") && face.studentId)
+      .map((face) => face.studentId),
+  );
+  const present = professors.filter((professor) => matched.has(professor.id));
+  const principals = present.filter((professor) => professor.isPrincipal);
+  const others = present.filter((professor) => !professor.isPrincipal).sort(rankInstructors);
+  return [...principals, ...others];
+}
+
+export function chooseInstructor(
+  professors: InstructorPerson[],
+  faces: { role: string; studentId: string | null }[],
+): string | null {
+  return matchedInstructors(professors, faces)[0]?.id ?? null;
+}
+
+export function nextInstructor(ids: string[], current: string | null): string | null {
+  if (ids.length === 0) return null;
+  const index = current ? ids.indexOf(current) : -1;
+  return ids[(index + 1) % ids.length];
 }
 
 const MAX_SIDE = 1600;

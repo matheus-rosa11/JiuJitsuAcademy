@@ -24,6 +24,65 @@ public static class DbSeeder
         {
             await SeedDemoDataAsync(db);
         }
+
+        if (seedDemoData)
+            await EnsurePrincipalProfessorAsync(db);
+    }
+
+    /// <summary>
+    /// The academy owner is a person with a face, not a second registry and not a class roster entry.
+    /// Existing databases are not reseeded, so this fills the principal only when nobody has the flag.
+    /// </summary>
+    private static async Task EnsurePrincipalProfessorAsync(AppDbContext db)
+    {
+        if (await db.Students.AnyAsync(s => s.IsPrincipalProfessor))
+            return;
+
+        var named = await db.Students.FirstOrDefaultAsync(s => s.Name == "Giba");
+        if (named is not null)
+        {
+            named.IsProfessor = true;
+            named.IsPrincipalProfessor = true;
+            named.UpdatedAt = DateTime.UtcNow;
+            await db.SaveChangesAsync();
+            return;
+        }
+
+        var black = await db.Belts.FirstOrDefaultAsync(b => b.Category == BeltCategory.Adult && b.Name == "Preta");
+        if (black is null)
+            return;
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var now = DateTime.UtcNow;
+        var giba = new Student
+        {
+            Id = Guid.NewGuid(),
+            Name = "Giba",
+            StudentType = StudentType.Adult,
+            BirthDate = today.AddYears(-48),
+            JoinedAt = today.AddYears(-20),
+            Active = true,
+            IsProfessor = true,
+            IsPrincipalProfessor = true,
+            CurrentBeltId = black.Id,
+            CurrentDegree = 0,
+            MonthlyFee = 0,
+            Email = "giba@email.com",
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+        db.Students.Add(giba);
+        db.Graduations.Add(new Graduation
+        {
+            Id = Guid.NewGuid(),
+            StudentId = giba.Id,
+            BeltId = black.Id,
+            Degree = 0,
+            Date = giba.JoinedAt,
+            Notes = "Faixa no cadastro",
+            CreatedAt = now
+        });
+        await db.SaveChangesAsync();
     }
 
     private static List<Belt> CreateBelts() =>
@@ -125,6 +184,12 @@ public static class DbSeeder
         foreach (var (name, age, months, beltIdx, degree, fee, active, rate) in adultDefs)
             AddStudent(name, StudentType.Adult, age, months, adultBelts[beltIdx], degree, fee, active, rate);
 
+        var giba = AddStudent("Giba", StudentType.Adult, 48, 240, adultBelts[4], 0, 0m, attendanceRate: 1);
+        giba.Email = "giba@email.com";
+        giba.IsProfessor = true;
+        giba.IsPrincipalProfessor = true;
+        students.First(s => s.Name == "Felipe Rocha").IsProfessor = true;
+
         // Children: (name, age, months training, belt index, degree, fee, responsibles with relationship)
         var childDefs = new (string, int, int, int, int, decimal, (string, string)[])[]
         {
@@ -182,6 +247,9 @@ public static class DbSeeder
         // Enrollment
         foreach (var student in students)
         {
+            if (student.IsPrincipalProfessor)
+                continue;
+
             if (student.StudentType == StudentType.Child)
             {
                 student.Classes.Add(new StudentClass { StudentId = student.Id, ClassId = childClass.Id });

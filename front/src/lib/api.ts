@@ -23,6 +23,8 @@ export interface StudentListItem {
   monthlyFee: number;
   phone: string | null;
   email: string | null;
+  isProfessor: boolean;
+  isPrincipalProfessor: boolean;
 }
 
 export interface StudentResponsible {
@@ -89,6 +91,17 @@ export interface StudentDetail {
   graduations: Graduation[];
   classes: ClassSummary[];
   recentPayments: Payment[];
+  isProfessor: boolean;
+  isPrincipalProfessor: boolean;
+}
+
+export interface Professor {
+  id: string;
+  name: string;
+  beltName: string;
+  beltOrder: number;
+  degree: number;
+  isPrincipal: boolean;
 }
 
 export interface ResponsibleLink {
@@ -114,6 +127,8 @@ export interface StudentRequest {
   notes: string | null;
   classIds: string[];
   responsibles: ResponsibleLink[];
+  isProfessor: boolean;
+  isPrincipalProfessor: boolean;
 }
 
 export interface Responsible {

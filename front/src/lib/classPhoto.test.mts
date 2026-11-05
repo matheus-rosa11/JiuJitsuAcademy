@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { absenceWarning, photoRoll, presenceUpdates } from "./classPhoto.ts";
+import { absenceWarning, chooseInstructor, matchedInstructors, nextInstructor, photoRoll, presenceUpdates } from "./classPhoto.ts";
 
 test("accepted faces become presences and a duplicate name is rejected", () => {
   const applied = presenceUpdates([
@@ -70,6 +70,60 @@ test("two faces for one student are not applied as presence", () => {
   );
   assert.deepEqual(roll.present, {});
   assert.equal(roll.reading.ana, "review");
+});
+
+test("an instructor face is not an unknown and is not marked present", () => {
+  const roll = photoRoll(
+    [{ studentId: "ana", status: "suggested", reason: "matched" }],
+    [
+      { role: "instructor", studentId: "giba" },
+      { role: "suggested", studentId: "ana" },
+    ],
+  );
+  assert.deepEqual(roll.present, { ana: true });
+  assert.equal(roll.unknownFaces, 0);
+  assert.equal(roll.reading.giba, undefined);
+});
+
+test("the principal is the instructor, otherwise the highest belt and degree", () => {
+  const professors = [
+    { id: "roxo", name: "Rafael Costa", beltOrder: 3, degree: 1, isPrincipal: false },
+    { id: "marrom", name: "Felipe Rocha", beltOrder: 4, degree: 0, isPrincipal: false },
+    { id: "giba", name: "Giba", beltOrder: 5, degree: 0, isPrincipal: true },
+  ];
+  const withPrincipal = [
+    { role: "suggested", studentId: "marrom" },
+    { role: "instructor", studentId: "giba" },
+    { role: "review", studentId: "roxo" },
+  ];
+  assert.equal(chooseInstructor(professors, withPrincipal), "giba");
+  assert.deepEqual(
+    matchedInstructors(professors, withPrincipal).map((professor) => professor.id),
+    ["giba", "marrom"],
+  );
+  assert.equal(
+    chooseInstructor(professors, [
+      { role: "suggested", studentId: "roxo" },
+      { role: "instructor", studentId: "marrom" },
+    ]),
+    "marrom",
+  );
+  assert.equal(
+    chooseInstructor(
+      [
+        { id: "a", name: "Ana", beltOrder: 4, degree: 1, isPrincipal: false },
+        { id: "b", name: "Bruno", beltOrder: 4, degree: 3, isPrincipal: false },
+      ],
+      [
+        { role: "suggested", studentId: "a" },
+        { role: "instructor", studentId: "b" },
+      ],
+    ),
+    "b",
+  );
+  assert.equal(chooseInstructor(professors, [{ role: "review", studentId: "giba" }]), null);
+  assert.equal(nextInstructor(["giba", "marrom"], "giba"), "marrom");
+  assert.equal(nextInstructor(["giba", "marrom"], "marrom"), "giba");
 });
 
 test("saving after a photo warns that unmarked students would be recorded absent", () => {

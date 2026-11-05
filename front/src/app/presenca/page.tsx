@@ -8,7 +8,7 @@ import { BeltBadge, BeltLabel } from "@/components/BeltBadge";
 import { ClassPhotoRoll } from "@/components/ClassPhotoRoll";
 import { useToast } from "@/components/Toast";
 import { Avatar, Badge, Button, buttonClass, Card, cn, EmptyState, ErrorState, Input, PageHeader, ProgressBar, Segmented, Select, Spinner, rateTone } from "@/components/ui";
-import { api, type AttendanceSheet, type StudentFrequency, type TrainingClass } from "@/lib/api";
+import { api, type AttendanceSheet, type Professor, type StudentFrequency, type TrainingClass } from "@/lib/api";
 import { absenceWarning, type FaceReading } from "@/lib/classPhoto";
 import { addDays, formatDate, formatDays, todayIso, WEEKDAYS, WEEKDAYS_FULL, weekdayOf } from "@/lib/format";
 import { useApi } from "@/lib/useApi";
@@ -32,6 +32,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
 
   const sheetPath = classId ? `/attendance/sheet?classId=${classId}&date=${date}` : null;
   const { data: sheet, error, reload } = useApi<AttendanceSheet>(sheetPath);
+  const professorsQuery = useApi<Professor[]>("/students/professors");
   const [marks, setMarks] = useState<{ key: string; values: Record<string, boolean> }>();
 
   const currentSheet = sheet && sheet.classId === classId && sheet.date === date ? sheet : undefined;
@@ -178,7 +179,7 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
 
       {error && !currentSheet ? (
         <ErrorState message={error} onRetry={reload} />
-      ) : !currentSheet ? (
+      ) : !currentSheet || professorsQuery.loading ? (
         <Spinner />
       ) : currentSheet.students.length === 0 ? (
         <Card>
@@ -189,6 +190,13 @@ function RollCall({ classes, initialClassId }: { classes: TrainingClass[]; initi
           <ClassPhotoRoll
             key={photoSession}
             students={currentSheet.students.map((student) => ({ studentId: student.studentId, name: student.name }))}
+            professors={(professorsQuery.data ?? []).map((professor) => ({
+              id: professor.id,
+              name: professor.name,
+              beltOrder: professor.beltOrder,
+              degree: professor.degree,
+              isPrincipal: professor.isPrincipal,
+            }))}
             onRecognized={(present, nextReading) => {
               setPhotoPresent(present);
               setReading(nextReading);
