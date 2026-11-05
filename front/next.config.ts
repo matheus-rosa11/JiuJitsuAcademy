@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    agentUpgrade: "security",
+  },
   // Self-contained server for the Docker image (see Dockerfile).
   output: "standalone",
   turbopack: {
