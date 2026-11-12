@@ -1,13 +1,15 @@
 "use client";
 
-import { Award, CalendarCheck, LayoutDashboard, School, Users, Wallet } from "lucide-react";
+import { Award, CalendarCheck, LayoutDashboard, LogOut, ScanFace, School, UserRound, Users, Wallet } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, type ReactNode } from "react";
+import { api } from "@/lib/api";
+import { useSession } from "./Session";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "./ui";
 
-const NAV = [
+const ADMIN_NAV = [
   { href: "/", label: "Dashboard", short: "Início", icon: LayoutDashboard },
   { href: "/alunos", label: "Alunos", short: "Alunos", icon: Users },
   { href: "/turmas", label: "Turmas", short: "Turmas", icon: School },
@@ -34,7 +36,39 @@ function Logo() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const router = useRouter();
+  const { user, loading, refresh } = useSession();
+  const publicPage = pathname === "/entrar" || pathname === "/criar-conta";
+  const studentHome = user?.role === "Student" && user.studentId ? `/alunos/${user.studentId}` : null;
+  const outsideOwnRecord = Boolean(studentHome && !pathname.startsWith(studentHome));
+
+  useEffect(() => {
+    if (loading || publicPage) return;
+    if (!user) {
+      router.replace("/entrar");
+      return;
+    }
+    if (studentHome && outsideOwnRecord) router.replace(studentHome);
+  }, [loading, publicPage, user, studentHome, outsideOwnRecord, router]);
+
+  if (publicPage) return <div className="min-h-dvh bg-zinc-50">{children}</div>;
+  if (loading || !user || outsideOwnRecord) {
+    return <div className="flex min-h-dvh items-center justify-center bg-zinc-50 text-sm text-zinc-500">Carregando...</div>;
+  }
+
+  const nav = studentHome
+    ? [
+        { href: studentHome, label: "Minha ficha", short: "Ficha", icon: UserRound },
+        { href: `${studentHome}/rosto`, label: "Meu rosto", short: "Rosto", icon: ScanFace },
+      ]
+    : ADMIN_NAV;
+  const isActive = (href: string) => (href === "/" || href === studentHome ? pathname === href : pathname.startsWith(href));
+
+  async function logout() {
+    await api("/auth/logout", { method: "POST" });
+    refresh();
+    router.replace("/entrar");
+  }
 
   return (
     <div className="min-h-dvh bg-zinc-50">
@@ -43,7 +77,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Logo />
         </div>
         <nav className="mt-10 flex flex-1 flex-col gap-1">
-          {NAV.map(({ href, label, icon: Icon }) => (
+          {nav.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
@@ -57,26 +91,35 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
+        <button type="button" onClick={() => void logout()} className="mb-3 flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-400 hover:bg-white/5 hover:text-white">
+          <LogOut className="size-5" />
+          Sair
+        </button>
         <div className="mb-3">
           <ThemeToggle />
         </div>
         <div className="rounded-xl bg-white/5 px-3 py-3 text-xs text-zinc-400">
-          <p className="font-medium text-zinc-200">Versão de demonstração</p>
-          <p className="mt-0.5">Dados fictícios para validação.</p>
+          <p className="font-medium text-zinc-200">{user.name}</p>
+          <p className="mt-0.5">{user.role === "Admin" ? "Administrador" : "Aluno"}</p>
         </div>
       </aside>
 
       <header className="palette-fixed sticky top-0 z-30 flex h-14 items-center justify-between bg-zinc-950 pl-4 pr-2 dark:border-b dark:border-white/5 lg:hidden">
         <Logo />
-        <ThemeToggle variant="icon" />
+        <div className="flex items-center">
+          <button type="button" onClick={() => void logout()} className="cursor-pointer rounded-xl p-2 text-zinc-300" aria-label="Sair">
+            <LogOut className="size-5" />
+          </button>
+          <ThemeToggle variant="icon" />
+        </div>
       </header>
 
       <main className="px-4 pb-28 pt-6 sm:px-6 lg:ml-64 lg:px-10 lg:pb-12 lg:pt-10">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-zinc-200 bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
-        {NAV.map(({ href, short, icon: Icon }) => (
+      <nav className={cn("fixed inset-x-0 bottom-0 z-30 grid border-t border-zinc-200 bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden", nav.length === 6 ? "grid-cols-6" : "grid-cols-2")}>
+        {nav.map(({ href, short, icon: Icon }) => (
           <Link
             key={href}
             href={href}
